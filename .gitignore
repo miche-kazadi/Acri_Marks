@@ -1,0 +1,25 @@
+# Python
+wichey/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+
+# Django
+*.log
+media/
+staticfiles/
+
+# Node
+node_modules/
+dist/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+frontend_Acricole_Platform.git-backup/
