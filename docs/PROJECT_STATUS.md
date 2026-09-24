@@ -25,10 +25,10 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 * [x] Configuration Django REST Framework
 * [x] Configuration Simple JWT
 * [x] Migrations de la base de données
+* [x] Endpoint `/api/v1/auth/logout/`
 
 ## ⬜ À faire
 
-* [x] Endpoint `/api/v1/auth/logout/`
 * [ ] Vérification complète des permissions par rôle
 * [ ] Tests automatisés de l'authentification
 
