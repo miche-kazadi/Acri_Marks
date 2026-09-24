@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from .serializers import LoginSerializer
 from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -26,6 +27,33 @@ class LoginView(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response(
+                {"error": "Le refresh token est requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"message": "Déconnexion réussie."},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception:
+            return Response(
+                {"error": "Refresh token invalide."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class OrderCreateView(APIView):
