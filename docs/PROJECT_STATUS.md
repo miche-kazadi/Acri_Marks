@@ -53,7 +53,7 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 ## ⬜ À faire
 
-* [ ] `GET /api/v1/products/`
+* [✅] `GET /api/v1/products/`
 * [ ] `GET /api/v1/products/:id/`
 * [ ] `POST /api/v1/products/`
 * [ ] `PATCH /api/v1/products/:id/`

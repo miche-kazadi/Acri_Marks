@@ -1,10 +1,9 @@
 from rest_framework import serializers
 from .models import Product, Order
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken
-class ProductSerializer(serializers.ModelSerializer):
+from rest_framework_simplejwt.tokens import RefreshToken 
 
+class ProductSerializer(serializers.ModelSerializer):
     producer_name = serializers.CharField(
         source="producer.full_name",
         read_only=True
