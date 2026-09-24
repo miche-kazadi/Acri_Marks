@@ -7,7 +7,7 @@ The `urlpatterns` list routes URLs to views.
 from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from core.views import LoginView, MeView, OrderCreateView, RegisterView
+from core.views import LoginView,LogoutView, MeView, OrderCreateView, RegisterView
 
 
 urlpatterns = [
@@ -43,4 +43,8 @@ urlpatterns = [
     MeView.as_view(),
     name="me"
     ),
+    path(
+        "api/v1/auth/logout/", 
+        LogoutView.as_view(),
+         name="logout"),
 ]
