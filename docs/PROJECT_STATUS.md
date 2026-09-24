@@ -28,7 +28,7 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 ## ⬜ À faire
 
-* [ ] Endpoint `/api/v1/auth/logout/`
+* [x] Endpoint `/api/v1/auth/logout/`
 * [ ] Vérification complète des permissions par rôle
 * [ ] Tests automatisés de l'authentification
 
