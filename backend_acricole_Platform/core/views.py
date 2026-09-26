@@ -3,14 +3,14 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Product, Order
-from .serializers import OrderSerializer
 from rest_framework.response import Response
 from .serializers import LoginSerializer
 from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from .permissions import IsAcheteur, IsProducteur
+from .serializers import OrderSerializer, ProductSerializer
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -57,7 +57,7 @@ class LogoutView(APIView):
 
 
 class OrderCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsAcheteur]
     @transaction.atomic
     def post(self, request):
         product_id = request.data.get("product")
@@ -95,14 +95,6 @@ class OrderCreateView(APIView):
                     "error": "Produit introuvable."
                 },
                 status=status.HTTP_404_NOT_FOUND
-            )
-
-        if request.user.role != "ACHETEUR":
-            return Response(
-                {
-                    "error": "Seuls les acheteurs peuvent passer une commande."
-                },
-                status=status.HTTP_403_FORBIDDEN
             )
 
         if product.status != Product.Status.OPEN:
@@ -189,3 +181,64 @@ class MeView(APIView):
             "role": user.role,
             "phone_or_email": user.phone_or_email,
         })
+
+class ProductListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        products = Product.objects.all().order_by("-created_at")
+        serializer = ProductSerializer(products, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        if request.user.role != "PRODUCTEUR":
+            return Response(
+                {
+                    "error": "Seuls les producteurs peuvent créer un produit."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ProductSerializer(data=request.data)
+
+        if serializer.is_valid():
+            product = serializer.save(
+                producer=request.user,
+                quantity_available=serializer.validated_data["quantity_total"]
+            )
+
+            return Response(
+                ProductSerializer(product).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+class ProductCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsProducteur]
+
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data)
+
+        if serializer.is_valid():
+            product = serializer.save(
+                producer=request.user,
+                quantity_available=serializer.validated_data["quantity_total"]
+            )
+
+            return Response(
+                ProductSerializer(product).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
