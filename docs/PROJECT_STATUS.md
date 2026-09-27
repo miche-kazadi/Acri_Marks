@@ -26,17 +26,19 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 * [x] Configuration Simple JWT
 * [x] Migrations de la base de données
 * [x] Endpoint `/api/v1/auth/logout/`
+* [x] Vérification des permissions par rôle
+* [x] Vérification du rôle `PRODUCTEUR`
+* [x] Vérification du rôle `ACHETEUR`
+* [x] Tests automatisés de l'authentification
 
 ## ⬜ À faire
 
-* [ ] Vérification complète des permissions par rôle
-* [ ] Tests automatisés de l'authentification
 
 ---
 
 # 🌾 BACKEND — Produits
 
-## ✅ Terminé
+## 🔄 En cours
 
 * [x] Modèle `Product`
 * [x] Catégorie Agriculture
@@ -50,10 +52,11 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 * [x] Description
 * [x] Statut du produit
 * [x] `ProductSerializer`
+* [x] Vérification du rôle producteur lors de la création
 
 ## ⬜ À faire
 
-* [✅] `GET /api/v1/products/`
+* [ ] `GET /api/v1/products/`
 * [ ] `GET /api/v1/products/:id/`
 * [ ] `POST /api/v1/products/`
 * [ ] `PATCH /api/v1/products/:id/`
@@ -120,14 +123,29 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 ## ⬜ À faire
 
-* [ ] Tests du modèle `User`
-* [ ] Tests Register
-* [ ] Tests Login
-* [ ] Tests `/auth/me/`
+### Authentification
+
+* [ ] Test du modèle `User`
+* [ ] Test Register
+* [ ] Test Login
+* [ ] Test `/auth/me/`
+* [ ] Test Logout
+* [ ] Test permissions `PRODUCTEUR`
+* [ ] Test permissions `ACHETEUR`
+
+### Produits
+
 * [ ] Tests Product
+* [ ] Tests création produit
+* [ ] Tests modification produit
+* [ ] Tests suppression produit
+* [ ] Tests permissions producteur
+
+### Commandes
+
 * [ ] Tests création commande
 * [ ] Test quantité insuffisante
-* [ ] Test produit SOLD_OUT
+* [ ] Test produit `SOLD_OUT`
 * [ ] Tests permissions
 * [ ] Tests annulation commande
 
@@ -187,15 +205,15 @@ Chaque fonctionnalité doit avoir sa propre branche.
 Exemple :
 
 ```bash
-git checkout -b feature/products-api
+git checkout -b feature/nom-de-la-fonctionnalite
 ```
 
 Puis :
 
 ```bash
 git add .
-git commit -m "feat: ajout de l'API produits"
-git push origin feature/products-api
+git commit -m "feat: description de la fonctionnalite"
+git push origin feature/nom-de-la-fonctionnalite
 ```
 
 Ensuite créer une Pull Request vers `master`.
@@ -216,12 +234,13 @@ Ensuite créer une Pull Request vers `master`.
 
 # 📌 Priorités
 
-1. Produits API
-2. Commandes API
-3. Permissions
-4. Commandes producteur
-5. Profil
-6. Tests backend
-7. Intégration complète frontend/backend
-8. Tests finaux
-9. Déploiement
+1. Tests automatisés de l'authentification
+2. API Produits
+3. Permissions Produits
+4. API Commandes
+5. Commandes producteur
+6. Profil
+7. Tests backend complets
+8. Intégration frontend/backend
+9. Tests finaux
+10. Déploiement
