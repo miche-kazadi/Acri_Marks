@@ -15,6 +15,8 @@ from core.views import (
     ProductDetailView,
     ProductListCreateView,
     RegisterView,
+    ProducerOrdersView,
+    
 )
 
 urlpatterns = [
@@ -67,5 +69,11 @@ urlpatterns = [
         "api/v1/auth/logout/", 
         LogoutView.as_view(),
          name="logout"),
+
+    path(
+    "api/v1/producer/orders/",
+    ProducerOrdersView.as_view(),
+    name="producer-orders"
+),
 
 ]

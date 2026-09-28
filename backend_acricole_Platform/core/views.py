@@ -374,3 +374,18 @@ class ProductDetailView(APIView):
             {"message": "Produit supprimé avec succès."},
             status=status.HTTP_204_NO_CONTENT
         )
+
+class ProducerOrdersView(APIView):
+    permission_classes = [IsAuthenticated, IsProducteur]
+
+    def get(self, request):
+        orders = Order.objects.filter(
+            product__producer=request.user
+        ).order_by("-created_at")
+
+        serializer = OrderSerializer(orders, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
