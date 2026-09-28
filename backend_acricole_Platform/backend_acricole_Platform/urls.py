@@ -12,7 +12,8 @@ from core.views import (
     LogoutView,
     MeView,
     OrderCreateView,
-    ProductCreateView,
+    ProductDetailView,
+    ProductListCreateView,
     RegisterView,
 )
 
@@ -40,23 +41,31 @@ urlpatterns = [
     
     path(
     "api/v1/products/",
-    ProductCreateView.as_view(),
-    name="product-create"
+    ProductListCreateView.as_view(),
+    name="product-list-create"
 ),
 
+    path(
+      'api/v1/products/<int:pk>/',
+      ProductDetailView.as_view(),
+      name='product-detail'
+    ),
     # Commandes
     path(
         "api/v1/orders/",
         OrderCreateView.as_view(),
         name="order-create"
     ),
+    
     path(
     "api/v1/auth/me/",
     MeView.as_view(),
     name="me"
     ),
+
     path(
         "api/v1/auth/logout/", 
         LogoutView.as_view(),
          name="logout"),
+
 ]

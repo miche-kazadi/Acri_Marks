@@ -26,11 +26,10 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 * [x] Configuration Simple JWT
 * [x] Migrations de la base de données
 * [x] Endpoint `/api/v1/auth/logout/`
+* [x] Vérification complète des permissions par rôle
+* [x] Tests automatisés de l'authentification
 
 ## ⬜ À faire
-
-* [ ] Vérification complète des permissions par rôle
-* [ ] Tests automatisés de l'authentification
 
 ---
 
@@ -50,21 +49,21 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 * [x] Description
 * [x] Statut du produit
 * [x] `ProductSerializer`
+* [x] `GET /api/v1/products/`
+* [x] `GET /api/v1/products/:id/`
+* [x] `POST /api/v1/products/`
+* [x] `PATCH /api/v1/products/:id/`
+* [x] `DELETE /api/v1/products/:id/`
+* [x] Recherche par nom
+* [x] Filtre par catégorie
+* [x] Filtre par localisation
+* [x] Filtre par date de disponibilité
+* [x] Pagination
+* [x] Vérifier que seul le producteur propriétaire peut modifier son produit
+* [x] Vérifier que seul le producteur propriétaire peut supprimer son produit
 
 ## ⬜ À faire
 
-* [✅] `GET /api/v1/products/`
-* [ ] `GET /api/v1/products/:id/`
-* [ ] `POST /api/v1/products/`
-* [ ] `PATCH /api/v1/products/:id/`
-* [ ] `DELETE /api/v1/products/:id/`
-* [ ] Recherche par nom
-* [ ] Filtre par catégorie
-* [ ] Filtre par localisation
-* [ ] Filtre par date de disponibilité
-* [ ] Pagination
-* [ ] Vérifier que seul le producteur propriétaire peut modifier son produit
-* [ ] Vérifier que seul le producteur propriétaire peut supprimer son produit
 
 ---
 

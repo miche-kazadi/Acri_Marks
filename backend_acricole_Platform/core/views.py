@@ -11,6 +11,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAcheteur, IsProducteur
 from .serializers import OrderSerializer, ProductSerializer
+from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -183,17 +185,49 @@ class MeView(APIView):
         })
 
 class ProductListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsProducteur()]
 
     def get(self, request):
-        products = Product.objects.all().order_by("-created_at")
-        serializer = ProductSerializer(products, many=True)
+        products = Product.objects.all()
 
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
+        search = request.query_params.get("search")
 
+        if search:
+            products = products.filter(
+                Q(title__icontains=search)
+            )
+
+        category = request.query_params.get("category")
+
+        if category:
+            products = products.filter(
+                category__iexact=category
+            )
+        location = request.query_params.get("location")
+
+        if location:
+            products = products.filter(
+                location__icontains=location
+            )
+
+        available_date = request.query_params.get("available_date")
+        if available_date:
+            products = products.filter(
+                available_date=available_date
+            )
+
+        products = products.order_by("-created_at")
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        page = paginator.paginate_queryset(products,request)
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+        
     def post(self, request):
         if request.user.role != "PRODUCTEUR":
             return Response(
@@ -241,4 +275,102 @@ class ProductCreateView(APIView):
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ProductDetailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        product = Product.objects.filter(pk=pk).first()
+
+        if not product:
+            return Response(
+                {"error": "Produit introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ProductSerializer(product)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def patch(self, request, pk):
+        product = Product.objects.filter(pk=pk).first()
+
+        if not product:
+            return Response(
+                {"error": "Produit introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentification requise."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        if request.user.role != "PRODUCTEUR":
+            return Response(
+                {"error": "Seuls les producteurs peuvent modifier un produit."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if product.producer != request.user:
+            return Response(
+                {"error": "Vous ne pouvez modifier que vos propres produits."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ProductSerializer(
+            product,
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            product = serializer.save()
+
+            return Response(
+                ProductSerializer(product).data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+        product = Product.objects.filter(pk=pk).first()
+        if not product:
+            return Response(
+                {"error": "Produit introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentification requise."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        if request.user.role != "PRODUCTEUR":
+            return Response(
+                {"error": "Seuls les producteurs peuvent supprimer un produit."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if product.producer != request.user:
+            return Response(
+                {"error": "Vous ne pouvez supprimer que vos propres produits."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        product.delete()
+        return Response(
+            {"message": "Produit supprimé avec succès."},
+            status=status.HTTP_204_NO_CONTENT
         )
