@@ -80,16 +80,13 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 - [x] Passage automatique à `SOLD_OUT`
 - [x] `transaction.atomic`
 - [x] `select_for_update`
-
-## ⬜ À faire
-
-- [ ] `GET /api/v1/orders/my-orders/`
-- [ ] `GET /api/v1/orders/:id/`
-- [ ] `POST /api/v1/orders/:id/cancel/`
-- [ ] Gestion des changements de statut
-- [ ] Vérification des permissions acheteur/producteur
-- [ ] Empêcher un acheteur de commander son propre produit
-- [ ] Tests des commandes
+- [x] `GET /api/v1/orders/my-orders/`
+- [x] `GET /api/v1/orders/:id/`
+- [x] `POST /api/v1/orders/:id/cancel/`
+- [x] Gestion des changements de statut
+- [x] Vérification des permissions acheteur/producteur
+- [x] Empêcher un acheteur de commander son propre produit
+- [x] Tests des commandes
 
 ---
 
@@ -131,19 +128,19 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 ### Produits
 
-- [ ] Tests Product
-- [ ] Tests création produit
-- [ ] Tests modification produit
-- [ ] Tests suppression produit
-- [ ] Tests permissions producteur
+- [x] Tests Product
+- [x] Tests création produit
+- [x] Tests modification produit
+- [x] Tests suppression produit
+- [x] Tests permissions producteur
 
 ### Commandes
 
-- [ ] Tests création commande
-- [ ] Test quantité insuffisante
-- [ ] Test produit `SOLD_OUT`
-- [ ] Tests permissions
-- [ ] Tests annulation commande
+- [x] Tests création commande
+- [x] Test quantité insuffisante
+- [x] Test produit `SOLD_OUT`
+- [x] Tests permissions
+- [x] Tests annulation commande
 
 ---
 

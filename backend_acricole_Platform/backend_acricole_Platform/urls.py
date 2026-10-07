@@ -12,10 +12,15 @@ from core.views import (
     LoginView,
     LogoutView,
     MeView,
+    MyOrdersView,
     OrderCreateView,
+    OrderDetailView,
+    OrderCancelView,
     ProductDetailView,
     ProductListCreateView,
     RegisterView,
+    OrderStatusUpdateView,
+    ProducerOrdersView,
 )
 
 
@@ -56,10 +61,36 @@ urlpatterns = [
 
     # Commandes
     path(
+        "api/v1/orders/my-orders/",
+        MyOrdersView.as_view(),
+        name="my-orders"
+    ),
+    path(
+        "api/v1/orders/<int:pk>/cancel/",
+        OrderCancelView.as_view(),
+        name="order-cancel"
+    ),
+    path(
+        "api/v1/orders/<int:pk>/status/",
+        OrderStatusUpdateView.as_view(),
+        name="order-status-update"
+    ),
+
+    path(
+        "api/v1/orders/<int:pk>/",
+        OrderDetailView.as_view(),
+        name="order-detail"
+    ),
+    path(
         "api/v1/orders/",
         OrderCreateView.as_view(),
         name="order-create"
     ),
+    path(
+    "api/v1/producer/orders/",
+    ProducerOrdersView.as_view(),
+    name="producer-orders"
+),
 
     # Authentification
     path(

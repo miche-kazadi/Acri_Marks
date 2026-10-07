@@ -101,6 +101,14 @@ class OrderCreateView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        if product.producer == request.user:
+            return Response(
+        {
+            "error": "Vous ne pouvez pas commander votre propre produit."
+        },
+        status=status.HTTP_403_FORBIDDEN
+    )
+
         if product.status != Product.Status.OPEN:
             return Response(
                 {
@@ -379,4 +387,173 @@ class ProductDetailView(APIView):
         return Response(
             {"message": "Produit supprimé avec succès."},
             status=status.HTTP_204_NO_CONTENT
+        )
+
+class MyOrdersView(APIView):
+    permission_classes = [IsAuthenticated, IsAcheteur]
+
+    def get(self, request):
+        orders = Order.objects.filter(
+            buyer=request.user
+        ).order_by("-created_at")
+
+        serializer = OrderSerializer(
+            orders,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+class OrderDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsAcheteur]
+
+    def get(self, request, pk):
+        order = Order.objects.filter(
+            id=pk,
+            buyer=request.user
+        ).first()
+
+        if not order:
+            return Response(
+                {"error": "Commande introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = OrderSerializer(order)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+class OrderCancelView(APIView):
+    permission_classes = [IsAuthenticated, IsAcheteur]
+
+    @transaction.atomic
+    def post(self, request, pk):
+        order = Order.objects.select_for_update().filter(
+            id=pk,
+            buyer=request.user
+        ).first()
+
+        if not order:
+            return Response(
+                {"error": "Commande introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if order.status != Order.Status.PENDING:
+            return Response(
+                {
+                    "error": "Seules les commandes en attente peuvent être annulées."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        product = Product.objects.select_for_update().get(
+            id=order.product_id
+        )
+
+        product.quantity_available += order.quantity
+
+        if product.quantity_available > 0:
+            product.status = Product.Status.OPEN
+
+        product.save()
+
+        order.status = Order.Status.CANCELLED
+        order.save(update_fields=["status"])
+
+        return Response(
+            {
+                "message": "Commande annulée avec succès.",
+                "order": OrderSerializer(order).data
+            },
+            status=status.HTTP_200_OK
+        )
+
+class OrderStatusUpdateView(APIView):
+    permission_classes = [IsAuthenticated, IsProducteur]
+
+    @transaction.atomic
+    def patch(self, request, pk):
+        order = Order.objects.select_for_update().filter(
+            id=pk,
+            product__producer=request.user
+        ).first()
+
+        if not order:
+            return Response(
+                {"error": "Commande introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        new_status = request.data.get("status")
+
+        if not new_status:
+            return Response(
+                {"error": "Le nouveau statut est obligatoire."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        allowed_transitions = {
+            Order.Status.PENDING: [
+                Order.Status.CONFIRMED,
+                Order.Status.CANCELLED,
+            ],
+            Order.Status.CONFIRMED: [
+                Order.Status.READY,
+                Order.Status.CANCELLED,
+            ],
+            Order.Status.READY: [
+                Order.Status.COMPLETED,
+            ],
+            Order.Status.COMPLETED: [],
+            Order.Status.CANCELLED: [],
+        }
+
+        if new_status not in allowed_transitions.get(
+            order.status,
+            []
+        ):
+            return Response(
+                {
+                    "error": (
+                        f"Transition impossible : "
+                        f"{order.status} → {new_status}"
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order.status = new_status
+        order.save(update_fields=["status"])
+
+        return Response(
+            OrderSerializer(order).data,
+            status=status.HTTP_200_OK
+        )
+
+class ProducerOrdersView(APIView):
+    permission_classes = [IsAuthenticated, IsProducteur]
+
+    def get(self, request):
+        orders = Order.objects.filter(
+            product__producer=request.user
+        ).select_related(
+            "buyer",
+            "product"
+        ).order_by("-created_at")
+
+        serializer = OrderSerializer(
+            orders,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
         )
