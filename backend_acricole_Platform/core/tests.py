@@ -1,10 +1,8 @@
 
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import User
 from django.test import TestCase
-from .models import User
-
+from .models import User, Product, Order
 
 class UserModelTest(TestCase):
 
@@ -230,4 +228,306 @@ class RolePermissionTest(APITestCase):
                 request.wsgi_request,
                 None
             )
+        )
+
+class ProducerOrdersTest(APITestCase):
+
+    def setUp(self):
+        self.producteur = User.objects.create_user(
+            username="producer_orders_test",
+            full_name="Producer Orders Test",
+            role="PRODUCTEUR",
+            phone_or_email="producer_orders@test.com",
+            password="password123"
+        )
+
+        self.acheteur = User.objects.create_user(
+            username="buyer_orders_test",
+            full_name="Buyer Orders Test",
+            role="ACHETEUR",
+            phone_or_email="buyer_orders@test.com",
+            password="password123"
+        )
+
+        self.product = Product.objects.create(
+            producer=self.producteur,
+            title="Maïs test",
+            category="AGRICULTURE",
+            quantity_total=100,
+            quantity_available=100,
+            unit="kg",
+            price_per_unit=10,
+            available_date="2026-10-20",
+            location="Kimpese",
+            description="Produit de test",
+            status="OPEN"
+        )
+
+        self.order = Order.objects.create(
+            buyer=self.acheteur,
+            product=self.product,
+            quantity=10,
+            unit_price=10,
+            total_price=100,
+            status="PENDING"
+        )
+
+    def test_producteur_voit_ses_commandes(self):
+        self.client.force_authenticate(
+            user=self.producteur
+        )
+
+        response = self.client.get(
+            "/api/v1/producer/orders/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            len(response.data),
+            1
+        )
+
+        self.assertEqual(
+            response.data[0]["id"],
+            self.order.id
+        )
+
+    def test_producteur_ne_voit_pas_les_commandes_des_autres(self):
+        autre_producteur = User.objects.create_user(
+            username="other_producer",
+            full_name="Other Producer",
+            role="PRODUCTEUR",
+            phone_or_email="other_producer@test.com",
+            password="password123"
+        )
+
+        autre_product = Product.objects.create(
+            producer=autre_producteur,
+            title="Riz test",
+            category="AGRICULTURE",
+            quantity_total=200,
+            quantity_available=200,
+            unit="kg",
+            price_per_unit=20,
+            available_date="2026-10-25",
+            location="Kinshasa",
+            description="Autre produit de test",
+            status="OPEN"
+        )
+
+        autre_order = Order.objects.create(
+            buyer=self.acheteur,
+            product=autre_product,
+            quantity=20,
+            unit_price=20,
+            total_price=400,
+            status="PENDING"
+        )
+
+        self.client.force_authenticate(
+            user=self.producteur
+        )
+
+        response = self.client.get(
+            "/api/v1/producer/orders/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEqual(
+            len(response.data),
+            1
+        )
+
+        self.assertEqual(
+            response.data[0]["id"],
+            self.order.id
+        )
+
+        self.assertNotEqual(
+            response.data[0]["id"],
+            autre_order.id
+        )
+
+class ProducerOrderStatusTest(APITestCase):
+
+    def setUp(self):
+        self.producteur = User.objects.create_user(
+            username="producer_status_test",
+            full_name="Producer Status Test",
+            role="PRODUCTEUR",
+            phone_or_email="producer_status@test.com",
+            password="password123"
+        )
+
+        self.acheteur = User.objects.create_user(
+            username="buyer_status_test",
+            full_name="Buyer Status Test",
+            role="ACHETEUR",
+            phone_or_email="buyer_status@test.com",
+            password="password123"
+        )
+
+        self.product = Product.objects.create(
+            producer=self.producteur,
+            title="Maïs statut test",
+            category="AGRICULTURE",
+            quantity_total=100,
+            quantity_available=100,
+            unit="kg",
+            price_per_unit=10,
+            available_date="2026-10-20",
+            location="Kimpese",
+            description="Produit de test",
+            status="OPEN"
+        )
+
+        self.order = Order.objects.create(
+            buyer=self.acheteur,
+            product=self.product,
+            quantity=10,
+            unit_price=10,
+            total_price=100,
+            status="PENDING"
+        )
+
+        self.client.force_authenticate(user=self.producteur)
+
+    def test_producteur_confirme_commande(self):
+        response = self.client.patch(
+            f"/api/v1/orders/{self.order.id}/status/",
+            {"status": "CONFIRMED"},
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.order.status,
+            "CONFIRMED"
+        )
+
+    def test_producteur_passe_commande_a_ready(self):
+        self.order.status = "CONFIRMED"
+        self.order.save()
+
+        response = self.client.patch(
+            f"/api/v1/orders/{self.order.id}/status/",
+            {"status": "READY"},
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.order.status,
+            "READY"
+        )
+
+    def test_producteur_termine_commande(self):
+        self.order.status = "READY"
+        self.order.save()
+
+        response = self.client.patch(
+            f"/api/v1/orders/{self.order.id}/status/",
+            {"status": "COMPLETED"},
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.order.status,
+            "COMPLETED"
+        )
+
+    def test_transition_invalide_refusee(self):
+        response = self.client.patch(
+            f"/api/v1/orders/{self.order.id}/status/",
+            {"status": "READY"},
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.order.status,
+            "PENDING"
+        )
+
+    def test_producteur_ne_peut_pas_modifier_commande_autre_producteur(self):
+        autre_producteur = User.objects.create_user(
+            username="other_producer_status",
+            full_name="Other Producer Status",
+            role="PRODUCTEUR",
+            phone_or_email="other_producer_status@test.com",
+            password="password123"
+        )
+
+        autre_product = Product.objects.create(
+            producer=autre_producteur,
+            title="Riz autre producteur",
+            category="AGRICULTURE",
+            quantity_total=200,
+            quantity_available=200,
+            unit="kg",
+            price_per_unit=20,
+            available_date="2026-10-25",
+            location="Kinshasa",
+            description="Autre produit",
+            status="OPEN"
+        )
+
+        autre_order = Order.objects.create(
+            buyer=self.acheteur,
+            product=autre_product,
+            quantity=20,
+            unit_price=20,
+            total_price=400,
+            status="PENDING"
+        )
+
+        response = self.client.patch(
+            f"/api/v1/orders/{autre_order.id}/status/",
+            {"status": "CONFIRMED"},
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND
+        )
+
+        autre_order.refresh_from_db()
+
+        self.assertEqual(
+            autre_order.status,
+            "PENDING"
         )
