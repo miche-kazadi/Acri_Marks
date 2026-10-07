@@ -92,12 +92,11 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 # 👨‍🌾 BACKEND — Producteur
 
-## ⬜ À faire
 
-- [ ] `GET /api/v1/producer/orders/`
-- [ ] Afficher les commandes des produits du producteur
-- [ ] Vérifier que le producteur ne voit que ses propres commandes
-- [ ] Gestion des statuts des commandes
+- [x] `GET /api/v1/producer/orders/`
+- [x] Afficher les commandes des produits du producteur
+- [x] Vérifier que le producteur ne voit que ses propres commandes
+- [x] Gestion des statuts des commandes
 
 ---
 
