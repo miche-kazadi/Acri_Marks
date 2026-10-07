@@ -1,6 +1,6 @@
 # 📊 Agri_Mark — État du projet
 
-> Dernière mise à jour : septembre 2026
+> Dernière mise à jour : octobre 2026
 
 ## 🎯 Objectif du projet
 
@@ -26,9 +26,7 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 - [x] Configuration Simple JWT
 - [x] Migrations de la base de données
 - [x] Endpoint `/api/v1/auth/logout/`
-- [x] Vérification des permissions par rôle
-- [x] Vérification du rôle `PRODUCTEUR`
-- [x] Vérification du rôle `ACHETEUR`
+- [x] Vérification complète des permissions par rôle
 - [x] Tests automatisés de l'authentification
 
 ## ⬜ À faire

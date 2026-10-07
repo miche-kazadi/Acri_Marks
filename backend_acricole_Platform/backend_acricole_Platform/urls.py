@@ -7,6 +7,7 @@ The `urlpatterns` list routes URLs to views.
 from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+
 from core.views import (
     LoginView,
     LogoutView,
@@ -16,6 +17,7 @@ from core.views import (
     ProductListCreateView,
     RegisterView,
 )
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -38,34 +40,37 @@ urlpatterns = [
         TokenRefreshView.as_view(),
         name="token-refresh"
     ),
-    
+
+    # Produits
     path(
-    "api/v1/products/",
-    ProductListCreateView.as_view(),
-    name="product-list-create"
-),
+        "api/v1/products/",
+        ProductListCreateView.as_view(),
+        name="product-list-create"
+    ),
 
     path(
-      'api/v1/products/<int:pk>/',
-      ProductDetailView.as_view(),
-      name='product-detail'
+        "api/v1/products/<int:pk>/",
+        ProductDetailView.as_view(),
+        name="product-detail"
     ),
+
     # Commandes
     path(
         "api/v1/orders/",
         OrderCreateView.as_view(),
         name="order-create"
     ),
-    
+
+    # Authentification
     path(
-    "api/v1/auth/me/",
-    MeView.as_view(),
-    name="me"
+        "api/v1/auth/me/",
+        MeView.as_view(),
+        name="me"
     ),
 
     path(
-        "api/v1/auth/logout/", 
+        "api/v1/auth/logout/",
         LogoutView.as_view(),
-         name="logout"),
-
+        name="logout"
+    ),
 ]

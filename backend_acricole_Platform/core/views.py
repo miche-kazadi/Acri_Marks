@@ -5,15 +5,17 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .models import Product, Order
 from rest_framework.response import Response
-from .serializers import LoginSerializer
-from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAcheteur, IsProducteur
-from .serializers import OrderSerializer, ProductSerializer
+from .serializers import (
+    OrderSerializer,
+    ProductSerializer,
+    LoginSerializer,
+    RegisterSerializer,
+)
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
-
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -83,7 +85,7 @@ class OrderCreateView(APIView):
         if quantity <= 0:
             return Response(
                 {
-                    "error": "La quantité doit être supérieure à zéro."
+                    "error": "La quantité doit être supérieure à rien . Vous fais une commende est donc elle dois imperativement etres au dessus de ZERO"
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -94,7 +96,7 @@ class OrderCreateView(APIView):
         if not product:
             return Response(
                 {
-                    "error": "Produit introuvable."
+                    "error": "Produit introuvable. Vous etez vous sur d avoir bien choisie !"
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
@@ -102,7 +104,7 @@ class OrderCreateView(APIView):
         if product.status != Product.Status.OPEN:
             return Response(
                 {
-                    "error": "Ce produit n'est pas disponible à la commande."
+                    "error": "Ce produit n'est pas disponible à la commande desole !. "
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -154,7 +156,7 @@ class RegisterView(APIView):
 
             return Response(
                 {
-                    "message": "Compte créé avec succès.",
+                    "message": "Compte créé avec succès. bienvenu !",
                     "user": {
                         "id": user.id,
                         "full_name": user.full_name,
@@ -232,10 +234,11 @@ class ProductListCreateView(APIView):
         if request.user.role != "PRODUCTEUR":
             return Response(
                 {
-                    "error": "Seuls les producteurs peuvent créer un produit."
+                    "error": "Seuls les producteurs peuvent créer un produit. vous etez un producter ? "
                 },
                 status=status.HTTP_403_FORBIDDEN
             )
+        
 
         serializer = ProductSerializer(data=request.data)
 
@@ -254,6 +257,9 @@ class ProductListCreateView(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+
 
 class ProductCreateView(APIView):
     permission_classes = [IsAuthenticated, IsProducteur]
