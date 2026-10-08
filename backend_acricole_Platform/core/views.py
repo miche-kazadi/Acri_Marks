@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import Product, Order
+from .models import Product, Order,User
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,9 +13,12 @@ from .serializers import (
     ProductSerializer,
     LoginSerializer,
     RegisterSerializer,
+    ProfileSerializer
+
 )
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -85,7 +88,7 @@ class OrderCreateView(APIView):
         if quantity <= 0:
             return Response(
                 {
-                    "error": "La quantité doit être supérieure à rien . Vous fais une commende est donc elle dois imperativement etres au dessus de ZERO"
+                    "error": "La quantité doit être supérieure à zero . Vous fais une commende est donc elle dois imperativement etres au dessus de ZERO"
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -556,4 +559,35 @@ class ProducerOrdersView(APIView):
         return Response(
             serializer.data,
             status=status.HTTP_200_OK
+        )
+
+class ProfilView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def patch(self, request):
+        serializer = ProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
         )
