@@ -151,10 +151,10 @@ Le frontend React/Vite est déjà initialisé.
 
 ## ⬜ À vérifier / compléter
 
-- [ ] Connexion à l'API
-- [ ] Gestion du JWT
-- [ ] Inscription
-- [ ] Connexion
+- [#] Connexion à l'API
+- [#] Gestion du JWT
+- [#] Inscription
+- [#] Connexion
 - [ ] Liste des produits
 - [ ] Recherche et filtres
 - [ ] Détail produit

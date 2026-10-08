@@ -154,11 +154,8 @@ class LoginSerializer(serializers.Serializer):
 
         if not user.is_active:
             raise serializers.ValidationError(
-                "Ce compte est désactivé ou n'exister pratiquement pas!."
+                "Ce compte est désactivé."
             )
-
-        if user.is_active:
-            raise serializers.ValidationError("ce compte est operationnel merci de votre fidelite !")
 
         refresh = RefreshToken.for_user(user)
 
