@@ -103,9 +103,9 @@ urlpatterns = [
 ),
 
 
-    #Profil user
+   # Profil user
     path(
-        "api/v1/Profile",
+        "api/v1/profile/",
         ProfilView.as_view(),
         name="profile-user"
     ),
