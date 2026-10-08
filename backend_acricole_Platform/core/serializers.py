@@ -76,10 +76,22 @@ class OrderSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-
-
-
 User = get_user_model()
+
+class ProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "full_name",
+            "phone_or_email",
+            "role",
+        ]
+        read_only_fields = [
+            "id",
+            "role",
+        ]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

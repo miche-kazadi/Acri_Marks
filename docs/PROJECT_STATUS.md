@@ -104,7 +104,7 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 
 ## ⬜ À faire
 
-- [ ] `GET /api/v1/profile/`
+- [x] `GET /api/v1/profile/`
 - [ ] `PATCH /api/v1/profile/`
 - [ ] Modifier les informations du profil
 - [ ] Vérifier les permissions

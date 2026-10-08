@@ -21,6 +21,7 @@ from core.views import (
     RegisterView,
     OrderStatusUpdateView,
     ProducerOrdersView,
+    ProfilView
 )
 
 
@@ -33,18 +34,27 @@ urlpatterns = [
         RegisterView.as_view(),
         name="register"
     ),
-
     path(
         "api/v1/auth/login/",
         LoginView.as_view(),
         name="token-obtain"
     ),
-
     path(
         "api/v1/auth/token/refresh/",
         TokenRefreshView.as_view(),
         name="token-refresh"
     ),
+    path(
+        "api/v1/auth/me/",
+        MeView.as_view(),
+        name="me"
+    ),
+    path(
+        "api/v1/auth/logout/",
+        LogoutView.as_view(),
+        name="logout"
+    ),
+
 
     # Produits
     path(
@@ -92,16 +102,12 @@ urlpatterns = [
     name="producer-orders"
 ),
 
-    # Authentification
-    path(
-        "api/v1/auth/me/",
-        MeView.as_view(),
-        name="me"
-    ),
 
+    #Profil user
     path(
-        "api/v1/auth/logout/",
-        LogoutView.as_view(),
-        name="logout"
+        "api/v1/Profile",
+        ProfilView.as_view(),
+        name="profile-user"
     ),
+    
 ]
