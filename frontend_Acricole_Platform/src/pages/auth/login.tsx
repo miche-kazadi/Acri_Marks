@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../../services/AuthService";
 
 function Login() {
@@ -8,6 +8,8 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -22,10 +24,16 @@ function Login() {
       );
 
       console.log("Login réussi :", data);
+      console.log("Profil connecté :", data.profile);
 
-      const profile = await AuthService.getProfile();
-
-      console.log("Profil connecté :", profile);
+      // Redirection selon le rôle
+      if (data.profile.role === "ACHETEUR") {
+        navigate("/acheteur");
+      } else if (data.profile.role === "PRODUCTEUR") {
+        navigate("/producteur");
+      } else {
+        navigate("/dashboard");
+      }
 
     } catch (error: any) {
       console.error("Erreur login :", error);
@@ -159,3 +167,4 @@ function Login() {
 }
 
 export default Login;
+
