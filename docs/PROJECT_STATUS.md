@@ -155,16 +155,16 @@ Le frontend React/Vite est déjà initialisé.
 - [#] Gestion du JWT
 - [#] Inscription
 - [#] Connexion
-- [ ] Liste des produits
+- [#] Liste des produits
 - [ ] Recherche et filtres
 - [ ] Détail produit
 - [ ] Création produit
 - [ ] Mes produits
 - [ ] Création commande
 - [ ] Mes commandes
-- [ ] Dashboard producteur
-- [ ] Profil
-- [ ] Protection des routes
+- [#] Dashboard producteur
+- [#] Profil
+- [#] Protection des routes
 - [ ] Gestion des erreurs API
 - [ ] États de chargement
 
