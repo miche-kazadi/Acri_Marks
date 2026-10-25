@@ -13,7 +13,6 @@ class IsProducteur(BasePermission):
             and request.user.role == "PRODUCTEUR"
         )
 
-
 class IsAcheteur(BasePermission):
     """
     Autorise uniquement les utilisateurs avec le rôle ACHETEUR.

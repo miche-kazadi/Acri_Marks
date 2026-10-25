@@ -591,3 +591,22 @@ class ProfilView(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ProducerProductsView(APIView):
+    permission_classes = [IsAuthenticated, IsProducteur]
+
+    def get(self, request):
+        products = Product.objects.filter(
+            producer=request.user
+        ).order_by("-created_at")
+
+        serializer = ProductSerializer(
+            products,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )

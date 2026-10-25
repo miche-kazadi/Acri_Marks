@@ -151,7 +151,7 @@ function Register() {
                 </div>
                 <div className="mb-4">
                   <label className="form-label fw-semibold">
-                    Je suis :
+                    <span className=""> vous etes qui ? </span>
                   </label>
 
                   <div className="row g-2">
@@ -197,7 +197,6 @@ function Register() {
                         Producteur
                       </label>
                     </div>
-
                   </div>
                 </div>
 
