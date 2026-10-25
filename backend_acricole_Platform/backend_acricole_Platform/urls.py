@@ -21,7 +21,8 @@ from core.views import (
     RegisterView,
     OrderStatusUpdateView,
     ProducerOrdersView,
-    ProfilView
+    ProducerProductsView,
+    ProfilView,
 )
 
 
@@ -68,6 +69,11 @@ urlpatterns = [
         ProductDetailView.as_view(),
         name="product-detail"
     ),
+    path(
+    "api/v1/producer/products/",
+    ProducerProductsView.as_view(),
+    name="producer-products"
+),  
 
     # Commandes
     path(

@@ -105,9 +105,9 @@ L'objectif est de permettre aux producteurs de publier leurs futures récoltes e
 ## ⬜ À faire
 
 - [x] `GET /api/v1/profile/`
-- [ ] `PATCH /api/v1/profile/`
-- [ ] Modifier les informations du profil
-- [ ] Vérifier les permissions
+- [x] `PATCH /api/v1/profile/`
+- [x] Modifier les informations du profil
+- [x] Vérifier les permissions
 
 ---
 
@@ -156,17 +156,17 @@ Le frontend React/Vite est déjà initialisé.
 - [#] Inscription
 - [#] Connexion
 - [#] Liste des produits
-- [ ] Recherche et filtres
-- [ ] Détail produit
-- [ ] Création produit
-- [ ] Mes produits
-- [ ] Création commande
-- [ ] Mes commandes
+- [x] Recherche et filtres
+- [x] Détail produit
+- [x] Création produit
+- [x] Mes produits
+- [x] Création commande
+- [x] Mes commandes
 - [#] Dashboard producteur
 - [#] Profil
 - [#] Protection des routes
-- [ ] Gestion des erreurs API
-- [ ] États de chargement
+- [x] Gestion des erreurs API
+- [x] États de chargement
 
 ---
 

@@ -1,21 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProductService from "../../services/ProductService";
+import type { Product } from "../../services/ProductService";
 import OrderService from "../../services/OrderService";
 
-type Product = {
-  id: number;
-  title: string;
-  category: string;
-  quantity_available: number;
-  unit: string;
-  price_per_unit: number;
-  location: string;
-  available_date: string;
-  description: string;
-  producer_name?: string;
-  status: string;
-};
+
 
 function ProduitDetail() {
   const { id } = useParams();
@@ -199,8 +188,7 @@ function ProduitDetail() {
                 <button
                   className="btn btn-success w-100"
                   onClick={handleOrder}
-                  disabled={ordering || quantity > product.quantity_available}
-                >
+                  disabled={ordering || quantity > Number(product.quantity_available)}                >
                   {ordering ? "Commande en cours..." : "Commander"}
                 </button>
 

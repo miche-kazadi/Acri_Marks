@@ -17,7 +17,6 @@ function Orders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState<number | null>(null);
-
   useEffect(() => {
     const loadOrders = async () => {
       try {
