@@ -256,7 +256,8 @@ class ProductListCreateView(APIView):
         if serializer.is_valid():
             product = serializer.save(
                 producer=request.user,
-                quantity_available=serializer.validated_data["quantity_total"]
+                quantity_available=serializer.validated_data["quantity_total"],
+                status=Product.Status.OPEN
             )
 
             return Response(
@@ -281,7 +282,7 @@ class ProductCreateView(APIView):
         if serializer.is_valid():
             product = serializer.save(
                 producer=request.user,
-                quantity_available=serializer.validated_data["quantity_total"]
+                quantity_available=serializer.validated_data["quantity_total"],
             )
 
             return Response(
