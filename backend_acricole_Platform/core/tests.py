@@ -531,3 +531,91 @@ class ProducerOrderStatusTest(APITestCase):
             autre_order.status,
             "PENDING"
         )
+
+
+
+class OrderStockTest(APITestCase):
+
+    def setUp(self):
+        self.producteur = User.objects.create_user(
+            username="stock_producteur",
+            full_name="Producteur Stock",
+            role="PRODUCTEUR",
+            phone_or_email="stock_producteur@test.com",
+            password="password123"
+        )
+
+        self.acheteur = User.objects.create_user(
+            username="stock_acheteur",
+            full_name="Acheteur Stock",
+            role="ACHETEUR",
+            phone_or_email="stock_acheteur@test.com",
+            password="password123"
+        )
+
+        self.product = Product.objects.create(
+            producer=self.producteur,
+            title="Maïs stock test",
+            category="AGRICULTURE",
+            quantity_total=100,
+            quantity_available=100,
+            unit="kg",
+            price_per_unit=10,
+            available_date="2026-10-20",
+            location="Kimpese",
+            description="Produit pour tester le stock",
+            status="OPEN"
+        )
+
+        self.client.force_authenticate(user=self.acheteur)
+
+    def test_commande_refusee_si_stock_insuffisant(self):
+        response = self.client.post(
+            "/api/v1/orders/",
+            {
+                "product": self.product.id,
+                "quantity": 101
+            },
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(self.product.quantity_available, 100)
+        self.assertEqual(
+            Order.objects.filter(product=self.product).count(),
+            0
+        )
+
+    def test_produit_passe_sold_out_si_stock_epuise(self):
+        response = self.client.post(
+            "/api/v1/orders/",
+            {
+                "product": self.product.id,
+                "quantity": 100
+            },
+            format="json"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(self.product.quantity_available, 0)
+        self.assertEqual(self.product.status, Product.Status.SOLD_OUT)
+
+        self.assertTrue(
+            Order.objects.filter(
+                buyer=self.acheteur,
+                product=self.product,
+                quantity=100
+            ).exists()
+        )
