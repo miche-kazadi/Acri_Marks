@@ -1,6 +1,127 @@
-/* Structure générale */
+/* =====================================================================
+   AGRI_MARK — FEUILLE DE STYLE (version améliorée)
+
+   SOMMAIRE
+   1. Variables (design tokens)
+   2. Base et accessibilité
+   3. Mise en page partagée
+   4. Navigation
+   5. Produits (cartes génériques)
+   6. Authentification
+   7. Tableau de bord
+   8. Accueil acheteur
+   9. Page d'accueil publique
+   10. Mouvement réduit
+   ===================================================================== */
+
+
+/* =====================================================================
+   1. VARIABLES
+   ===================================================================== */
+
+:root {
+  /* Couleurs */
+  --agri-green: #174d38;
+  --agri-green-dark: #103b2a;
+  --agri-green-mid: #276647;
+  --agri-green-light: #e5efe7;
+  --agri-green-soft: #e8f0e8;
+  --agri-leaf: #6e9250;
+  --agri-leaf-soft: #7b9b57;
+  --agri-cream: #f7f5ed;
+  --agri-white: #fff;
+  --agri-text: #20352b;
+  --agri-text-soft: #48594e;
+  --agri-muted: #718076;
+  --agri-muted-light: #87938a;
+  --agri-border: #e0e6dc;
+  --agri-border-soft: #e3e8e1;
+  --agri-line: #edf0eb;
+  --agri-danger: #a53b2c;
+  --agri-danger-bg: #f9e7e3;
+
+  /* Typographie */
+  --font-main: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+  /* Formes */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Ombres */
+  --shadow-sm: 0 5px 18px rgba(23, 77, 56, 0.035);
+  --shadow-md: 0 8px 25px rgba(23, 77, 56, 0.045);
+  --shadow-lg: 0 18px 36px rgba(23, 77, 56, 0.11);
+
+  /* Animations */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --speed: 200ms;
+
+  /* Mise en page */
+  --container: 1180px;
+  --focus-ring: 0 0 0 3px rgba(23, 77, 56, 0.3);
+}
+
+
+/* =====================================================================
+   2. BASE ET ACCESSIBILITÉ
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+  /* évite que la navbar cache les ancres */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  color: var(--agri-text);
+  background: var(--agri-cream);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Contour visible au clavier uniquement */
+:focus-visible {
+  outline: 2px solid var(--agri-green);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+
+/* =====================================================================
+   3. MISE EN PAGE PARTAGÉE
+   ===================================================================== */
+
 .page-container {
-  width: min(1180px, calc(100% - 40px));
+  width: min(var(--container), calc(100% - 40px));
   margin-inline: auto;
   padding-block: 40px 64px;
 }
@@ -14,7 +135,62 @@
   color: var(--agri-muted);
 }
 
-/* Navigation partagée */
+/* Toutes les grilles à 3 colonnes partagent la même base */
+.product-grid,
+.buyer-product-grid,
+.buyer-steps-grid,
+.landing-role-grid,
+.landing-feature-grid,
+.landing-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap, 24px);
+}
+
+.buyer-product-grid {
+  --gap: 23px;
+}
+
+.buyer-steps-grid {
+  --gap: 22px;
+}
+
+.landing-role-grid {
+  --gap: 20px;
+}
+
+.landing-feature-grid {
+  --gap: 17px;
+}
+
+.landing-steps-grid {
+  --gap: 34px;
+}
+
+@media (max-width: 900px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .page-container {
+    width: min(100% - 28px, var(--container));
+    padding-block: 26px 44px;
+  }
+
+  .product-grid {
+    grid-template-columns: minmax(0, 1fr);
+    --gap: 16px;
+  }
+}
+
+
+/* =====================================================================
+   4. NAVIGATION (Bootstrap)
+   ===================================================================== */
+
+/* !important nécessaire : Bootstrap impose bg-success avec !important */
 .navbar.bg-success {
   position: sticky;
   top: 0;
@@ -25,7 +201,7 @@
 }
 
 .navbar .navbar-brand {
-  color: #fff;
+  color: var(--agri-white);
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -35,43 +211,49 @@
   color: rgba(255, 255, 255, 0.84);
   font-weight: 550;
   padding-inline: 12px;
+  transition: color var(--speed) var(--ease);
 }
 
 .navbar .nav-link:hover,
 .navbar .nav-link:focus {
-  color: #fff;
+  color: var(--agri-white);
 }
 
 .navbar .btn-outline-light {
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
 }
 
-/* Catalogue et cartes de produits */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+@media (max-width: 576px) {
+  .navbar.bg-success {
+    min-height: 66px;
+  }
 }
+
+
+/* =====================================================================
+   5. PRODUITS (cartes génériques)
+   ===================================================================== */
 
 .product-card {
   height: 100%;
   transition:
-    transform 200ms ease,
-    box-shadow 200ms ease,
-    border-color 200ms ease;
+    transform var(--speed) var(--ease),
+    box-shadow var(--speed) var(--ease),
+    border-color var(--speed) var(--ease);
 }
 
 .product-card:hover {
   transform: translateY(-4px);
   border-color: #b8cbbd !important;
+  /* Bootstrap impose la bordure des .card */
   box-shadow: 0 16px 38px rgba(23, 77, 56, 0.12);
 }
 
 .product-category {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 5px 11px;
   background: var(--agri-green-light);
   color: var(--agri-green);
@@ -90,16 +272,20 @@
   font-size: 0.9rem;
 }
 
-/* Authentification */
+
+/* =====================================================================
+   6. AUTHENTIFICATION
+   ===================================================================== */
+
 .auth-page {
   display: grid;
   min-height: 100vh;
+  min-height: 100dvh;
+  /* mobile : tient compte de la barre d'adresse */
   place-items: center;
   padding: 32px 16px;
   background:
-    radial-gradient(ellipse at top left,
-      rgba(183, 209, 179, 0.36),
-      transparent 42%),
+    radial-gradient(ellipse at top left, rgba(183, 209, 179, 0.36), transparent 42%),
     var(--agri-cream);
 }
 
@@ -115,9 +301,9 @@
   width: 60px;
   height: 60px;
   margin-bottom: 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: var(--agri-green);
-  color: #fff;
+  color: var(--agri-white);
   font-size: 1.8rem;
 }
 
@@ -125,7 +311,7 @@
   color: var(--agri-muted);
 }
 
-/* Sélection du type de compte */
+/* Choix du type de compte */
 .role-option {
   display: flex;
   min-height: 94px;
@@ -136,11 +322,14 @@
   width: 100%;
   padding: 12px;
   border: 1px solid var(--agri-border);
-  border-radius: 14px;
-  background: #fff;
+  border-radius: var(--radius-md);
+  background: var(--agri-white);
   color: var(--agri-text);
-  cursor: pointer;
   text-align: center;
+  transition:
+    border-color var(--speed) var(--ease),
+    background var(--speed) var(--ease),
+    box-shadow var(--speed) var(--ease);
 }
 
 .role-option:hover {
@@ -154,7 +343,11 @@
   box-shadow: inset 0 0 0 1px var(--agri-green);
 }
 
-/* Sections du tableau de bord */
+
+/* =====================================================================
+   7. TABLEAU DE BORD
+   ===================================================================== */
+
 .dashboard-section {
   margin-bottom: 32px;
 }
@@ -168,35 +361,16 @@
   margin-bottom: 18px;
 }
 
-@media (max-width: 900px) {
-  .product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 
-@media (max-width: 576px) {
-  .page-container {
-    width: min(100% - 28px, 1180px);
-    padding-block: 26px 44px;
-  }
-
-  .product-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-
-  .navbar.bg-success {
-    min-height: 66px;
-  }
-}
-
-/* ========================================
-   ACCUEIL ACHETEUR — AGRI_MARK
-======================================== */
+/* =====================================================================
+   8. ACCUEIL ACHETEUR
+   ===================================================================== */
 
 .buyer-home {
   overflow: hidden;
 }
+
+/* ---------- Hero ---------- */
 
 .buyer-hero {
   position: relative;
@@ -206,11 +380,11 @@
   gap: 30px;
   min-height: 440px;
   overflow: hidden;
-  padding: 60px max(6vw, calc((100vw - 1180px) / 2));
+  padding: 60px max(6vw, calc((100vw - var(--container)) / 2));
   background:
     radial-gradient(ellipse at 85% 15%, rgba(199, 220, 169, 0.22), transparent 38%),
-    linear-gradient(120deg, #103b2a 0%, #174d38 65%, #276647 100%);
-  color: #fff;
+    linear-gradient(120deg, var(--agri-green-dark) 0%, var(--agri-green) 65%, var(--agri-green-mid) 100%);
+  color: var(--agri-white);
 }
 
 .buyer-hero::after {
@@ -242,7 +416,7 @@
 
 .buyer-eyebrow {
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 8px 13px;
   background: rgba(255, 255, 255, 0.08);
   color: #e6f0dc;
@@ -251,11 +425,12 @@
 
 .buyer-hero h1 {
   margin: 8px 0 18px;
-  color: #fff;
+  color: var(--agri-white);
   font-size: clamp(2.4rem, 4.5vw, 4.2rem);
   font-weight: 800;
   letter-spacing: -0.06em;
   line-height: 1.07;
+  text-wrap: balance;
 }
 
 .buyer-hero h1 span {
@@ -276,15 +451,19 @@
   border-radius: 12px;
   padding: 14px 20px;
   background: #f5f0e5;
-  color: #174d38;
+  color: var(--agri-green);
   font-weight: 750;
   text-decoration: none;
+  transition:
+    transform var(--speed) var(--ease),
+    background var(--speed) var(--ease),
+    color var(--speed) var(--ease);
 }
 
 .buyer-hero-button:hover {
   transform: translateY(-2px);
-  background: #fff;
-  color: #103b2a;
+  background: var(--agri-white);
+  color: var(--agri-green-dark);
 }
 
 .buyer-hero-benefits {
@@ -295,6 +474,8 @@
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.83rem;
 }
+
+/* ---------- Illustration du hero ---------- */
 
 .buyer-hero-art {
   position: relative;
@@ -344,8 +525,8 @@
   height: 58px;
   place-items: center;
   border: 1px solid rgba(23, 77, 56, 0.08);
-  border-radius: 18px;
-  background: #fff;
+  border-radius: var(--radius-lg);
+  background: var(--agri-white);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   font-size: 1.9rem;
 }
@@ -378,8 +559,8 @@
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 15px;
   padding: 13px 17px;
-  background: #fff;
-  color: #20352b;
+  background: var(--agri-white);
+  color: var(--agri-text);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.13);
 }
 
@@ -389,8 +570,8 @@
   height: 34px;
   place-items: center;
   border-radius: 50%;
-  background: #e5efe7;
-  color: #174d38;
+  background: var(--agri-green-light);
+  color: var(--agri-green);
   font-weight: 900;
 }
 
@@ -405,8 +586,10 @@
 
 .buyer-floating-note small {
   margin-top: 2px;
-  color: #718076;
+  color: var(--agri-muted);
 }
+
+/* ---------- Catalogue ---------- */
 
 .buyer-catalogue {
   padding-top: 56px;
@@ -435,7 +618,7 @@
 .buyer-section-heading p,
 .buyer-how-heading p {
   margin: 0;
-  color: #718076;
+  color: var(--agri-muted);
 }
 
 .buyer-catalogue-count {
@@ -447,15 +630,17 @@
 }
 
 .buyer-catalogue-count strong {
-  color: #174d38;
+  color: var(--agri-green);
   font-size: 1.8rem;
   line-height: 1.2;
 }
 
 .buyer-catalogue-count span {
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 0.8rem;
 }
+
+/* ---------- Recherche et filtres ---------- */
 
 .buyer-filter-panel {
   display: grid;
@@ -468,11 +653,18 @@
   align-items: center;
   gap: 12px;
   min-height: 56px;
-  border: 1px solid #e0e6dc;
-  border-radius: 14px;
+  border: 1px solid var(--agri-border);
+  border-radius: var(--radius-md);
   padding: 0 17px;
-  background: #fff;
-  box-shadow: 0 5px 18px rgba(23, 77, 56, 0.035);
+  background: var(--agri-white);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+/* Le champ est mis en évidence quand on tape dedans */
+.buyer-search-box:focus-within {
+  border-color: var(--agri-green);
+  box-shadow: var(--focus-ring);
 }
 
 .buyer-search-box>span {
@@ -487,7 +679,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #20352b;
+  color: var(--agri-text);
   font-size: 0.95rem;
 }
 
@@ -498,8 +690,14 @@
 .buyer-clear-search {
   border: 0;
   background: transparent;
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 1.5rem;
+  line-height: 1;
+  transition: color var(--speed) var(--ease);
+}
+
+.buyer-clear-search:hover {
+  color: var(--agri-text);
 }
 
 .buyer-category-filters {
@@ -513,13 +711,17 @@
   align-items: center;
   gap: 10px;
   min-height: 42px;
-  border: 1px solid #e0e6dc;
-  border-radius: 999px;
+  border: 1px solid var(--agri-border);
+  border-radius: var(--radius-pill);
   padding: 8px 15px;
-  background: #fff;
+  background: var(--agri-white);
   color: #52645a;
   font-size: 0.88rem;
   font-weight: 650;
+  transition:
+    background var(--speed) var(--ease),
+    border-color var(--speed) var(--ease),
+    color var(--speed) var(--ease);
 }
 
 .buyer-category-filters button span {
@@ -527,7 +729,7 @@
   min-width: 22px;
   height: 22px;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: #f0f3ed;
   color: #657469;
   font-size: 0.72rem;
@@ -535,36 +737,32 @@
 
 .buyer-category-filters button:hover,
 .buyer-category-filters button.active {
-  border-color: #174d38;
-  background: #174d38;
-  color: #fff;
+  border-color: var(--agri-green);
+  background: var(--agri-green);
+  color: var(--agri-white);
 }
 
-.buyer-category-filters button.active span,
-.buyer-category-filters button:hover span {
+.buyer-category-filters button:hover span,
+.buyer-category-filters button.active span {
   background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  color: var(--agri-white);
 }
 
-.buyer-product-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 23px;
-}
+/* ---------- Cartes produit ---------- */
 
 .buyer-product-card {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #e3e8e1;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 8px 25px rgba(23, 77, 56, 0.045);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  border: 1px solid var(--agri-border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--agri-white);
+  box-shadow: var(--shadow-md);
+  transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
 }
 
 .buyer-product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 18px 36px rgba(23, 77, 56, 0.11);
+  box-shadow: var(--shadow-lg);
 }
 
 .buyer-product-visual {
@@ -590,7 +788,7 @@
 .buyer-product-emoji {
   font-size: 4.5rem;
   filter: drop-shadow(0 7px 7px rgba(23, 77, 56, 0.1));
-  transition: transform 180ms ease;
+  transition: transform 180ms var(--ease);
 }
 
 .buyer-product-card:hover .buyer-product-emoji {
@@ -602,10 +800,10 @@
   top: 13px;
   left: 13px;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 5px 10px;
   background: rgba(255, 255, 255, 0.91);
-  color: #174d38;
+  color: var(--agri-green);
   font-size: 0.72rem;
   font-weight: 750;
 }
@@ -619,14 +817,14 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 0.8rem;
 }
 
 .buyer-product-body h3 {
   min-height: 48px;
   margin: 0 0 15px;
-  color: #20352b;
+  color: var(--agri-text);
   font-size: 1.12rem;
   letter-spacing: -0.025em;
 }
@@ -656,7 +854,7 @@
 
 .buyer-product-producer small {
   margin-bottom: 2px;
-  color: #87938a;
+  color: var(--agri-muted-light);
   font-size: 0.72rem;
 }
 
@@ -669,8 +867,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  border-top: 1px solid #edf0eb;
-  border-bottom: 1px solid #edf0eb;
+  border-block: 1px solid var(--agri-line);
   padding-block: 14px;
 }
 
@@ -679,32 +876,32 @@
 }
 
 .buyer-product-details>div+div {
-  border-left: 1px solid #edf0eb;
+  border-left: 1px solid var(--agri-line);
   padding-left: 12px;
 }
 
 .buyer-product-details small {
   display: block;
   margin-bottom: 5px;
-  color: #87938a;
+  color: var(--agri-muted-light);
   font-size: 0.73rem;
 }
 
 .buyer-product-details strong {
   display: block;
   overflow-wrap: anywhere;
-  color: #20352b;
+  color: var(--agri-text);
   font-size: 0.91rem;
 }
 
 .buyer-product-details .buyer-product-price {
-  color: #174d38;
+  color: var(--agri-green);
   font-size: 1rem;
 }
 
 .buyer-product-details .buyer-product-price small {
   display: inline;
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 0.72rem;
   font-weight: 500;
 }
@@ -714,7 +911,7 @@
   align-items: center;
   gap: 7px;
   margin-top: 14px;
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 0.78rem;
 }
 
@@ -725,20 +922,25 @@
   gap: 10px;
   margin-top: 18px;
   border: 1px solid #c9d8cb;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 11px 13px;
-  color: #174d38;
+  color: var(--agri-green);
   font-size: 0.88rem;
   font-weight: 750;
   text-decoration: none;
-  transition: background 180ms ease, color 180ms ease;
+  transition:
+    background 180ms var(--ease),
+    color 180ms var(--ease),
+    border-color 180ms var(--ease);
 }
 
 .buyer-product-link:hover {
-  border-color: #174d38;
-  background: #174d38;
-  color: #fff;
+  border-color: var(--agri-green);
+  background: var(--agri-green);
+  color: var(--agri-white);
 }
+
+/* ---------- États : chargement, erreur, vide ---------- */
 
 .buyer-state-panel {
   display: flex;
@@ -748,7 +950,7 @@
   justify-content: center;
   gap: 10px;
   border: 1px dashed #d7e0d5;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 30px 20px;
   background: rgba(255, 255, 255, 0.66);
   text-align: center;
@@ -766,7 +968,7 @@
 .buyer-state-panel p {
   max-width: 500px;
   margin: 0 0 8px;
-  color: #718076;
+  color: var(--agri-muted);
 }
 
 .buyer-state-icon {
@@ -775,16 +977,18 @@
   height: 52px;
   place-items: center;
   border-radius: 16px;
-  background: #e5efe7;
-  color: #174d38;
+  background: var(--agri-green-light);
+  color: var(--agri-green);
   font-size: 1.8rem;
   font-weight: 800;
 }
 
 .buyer-error-panel .buyer-state-icon {
-  background: #f9e7e3;
-  color: #a53b2c;
+  background: var(--agri-danger-bg);
+  color: var(--agri-danger);
 }
+
+/* ---------- Comment ça marche ---------- */
 
 .buyer-how-it-works {
   padding-top: 35px;
@@ -801,18 +1005,12 @@
   margin-inline: auto;
 }
 
-.buyer-steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
-}
-
 .buyer-step {
   position: relative;
-  border: 1px solid #e3e8e1;
-  border-radius: 18px;
+  border: 1px solid var(--agri-border-soft);
+  border-radius: var(--radius-lg);
   padding: 25px;
-  background: #fff;
+  background: var(--agri-white);
 }
 
 .buyer-step-number {
@@ -842,9 +1040,11 @@
 
 .buyer-step p {
   margin: 0;
-  color: #718076;
+  color: var(--agri-muted);
   font-size: 0.91rem;
 }
+
+/* ---------- Responsive acheteur ---------- */
 
 @media (max-width: 1000px) {
   .buyer-hero {
@@ -897,7 +1097,6 @@
   }
 
   .buyer-catalogue-count {
-    align-items: end;
     padding-top: 6px;
   }
 
@@ -929,29 +1128,16 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
 
-  .buyer-product-card,
-  .buyer-product-emoji,
-  .buyer-product-link,
-  .buyer-hero-button {
-    transition: none;
-  }
-}
-
-/* ========================================
-   AGRI_MARK — PAGE D'ACCUEIL PUBLIQUE
-   ======================================== */
+/* =====================================================================
+   9. PAGE D'ACCUEIL PUBLIQUE
+   ===================================================================== */
 
 .landing-page {
-  --landing-green: #174d38;
-  --landing-green-dark: #103b2a;
-  --landing-green-soft: #e8f0e8;
-  --landing-cream: #f7f5ed;
-  --landing-muted: #68766d;
-  overflow: hidden;
-  background: #fff;
-  color: #20352b;
+  overflow-x: hidden;
+  /* ne bloque plus le défilement vertical ni le sticky */
+  background: var(--agri-white);
+  color: var(--agri-text);
 }
 
 .landing-page a {
@@ -963,16 +1149,18 @@
   margin-inline: auto;
 }
 
+/* ---------- En-tête ---------- */
+
 .landing-header {
   position: relative;
   z-index: 5;
+  border-bottom: 1px solid var(--agri-line);
   background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid #edf0eb;
 }
 
 .landing-nav {
-  min-height: 82px;
   display: flex;
+  min-height: 82px;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -983,23 +1171,23 @@
   align-items: center;
   gap: 9px;
   flex-shrink: 0;
-  color: var(--landing-green);
+  color: var(--agri-green);
   font-size: 1.45rem;
   font-weight: 850;
   letter-spacing: -0.06em;
 }
 
 .landing-brand>span:last-child>span {
-  color: #7b9b57;
+  color: var(--agri-leaf-soft);
 }
 
 .landing-brand-icon {
   display: grid;
-  place-items: center;
   width: 38px;
   height: 38px;
+  place-items: center;
   border-radius: 12px;
-  background: var(--landing-green-soft);
+  background: var(--agri-green-soft);
   font-size: 1.25rem;
 }
 
@@ -1012,54 +1200,72 @@
 
 .landing-nav-links a,
 .landing-login-link {
-  color: #48594e;
+  color: var(--agri-text-soft);
   font-size: 0.9rem;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition: color var(--speed) var(--ease);
 }
 
 .landing-nav-links a:hover,
 .landing-login-link:hover {
-  color: var(--landing-green);
+  color: var(--agri-green);
 }
 
-.landing-button {
+/* ---------- Boutons ----------
+   Sélecteur renforcé (.landing-page .x) : plus besoin de !important */
+
+.landing-page .landing-button {
   display: inline-flex;
   min-height: 50px;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 13px 21px;
-  border: 1px solid var(--landing-green);
+  border: 1px solid var(--agri-green);
   border-radius: 12px;
-  background: var(--landing-green);
-  color: #fff !important;
+  background: var(--agri-green);
+  color: var(--agri-white);
   font-weight: 700;
   text-align: center;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform var(--speed) var(--ease),
+    background var(--speed) var(--ease),
+    box-shadow var(--speed) var(--ease);
 }
 
-.landing-button:hover {
+.landing-page .landing-button:hover {
   transform: translateY(-2px);
-  background: var(--landing-green-dark);
+  background: var(--agri-green-dark);
   box-shadow: 0 8px 22px rgba(16, 59, 42, 0.16);
 }
 
-.landing-button-small {
+.landing-page .landing-button-small {
   min-height: 42px;
   padding: 10px 15px;
   font-size: 0.87rem;
 }
 
-.landing-button-light {
+.landing-page .landing-button-light {
   border-color: #d7e1d7;
-  background: #fff;
-  color: var(--landing-green) !important;
+  background: var(--agri-white);
+  color: var(--agri-green);
 }
 
-.landing-button-light:hover {
-  background: var(--landing-green-soft);
+.landing-page .landing-button-light:hover {
+  background: var(--agri-green-soft);
 }
+
+.landing-page .landing-button-white {
+  border-color: var(--agri-white);
+  background: var(--agri-white);
+  color: var(--agri-green);
+}
+
+.landing-page .landing-button-white:hover {
+  background: #edf4e9;
+}
+
+/* ---------- Hero ---------- */
 
 .landing-hero {
   padding-top: 72px;
@@ -1084,7 +1290,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--landing-green);
+  color: var(--agri-green);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.095em;
@@ -1094,7 +1300,7 @@
 .landing-eyebrow {
   padding: 9px 13px;
   border: 1px solid #dce8d9;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.8);
   letter-spacing: 0;
   text-transform: none;
@@ -1103,15 +1309,16 @@
 .landing-hero h1 {
   max-width: 620px;
   margin: 24px 0 19px;
-  color: var(--landing-green-dark);
+  color: var(--agri-green-dark);
   font-size: clamp(2.7rem, 5vw, 4.5rem);
   font-weight: 850;
   letter-spacing: -0.075em;
   line-height: 1.05;
+  text-wrap: balance;
 }
 
 .landing-hero h1 span {
-  color: #6e9250;
+  color: var(--agri-leaf);
 }
 
 .landing-hero-description {
@@ -1144,7 +1351,7 @@
   place-items: center;
   border-radius: 50%;
   background: #dcebd9;
-  color: var(--landing-green);
+  color: var(--agri-green);
   font-weight: 800;
 }
 
@@ -1161,6 +1368,7 @@
   border: 7px solid rgba(255, 255, 255, 0.85);
   border-radius: 35px 35px 110px 35px;
   background-color: #91a878;
+  /* couleur affichée si l'image ne charge pas */
   background-image:
     linear-gradient(180deg, transparent 45%, rgba(12, 42, 27, 0.78) 100%),
     url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1100&q=85");
@@ -1171,23 +1379,22 @@
 
 .landing-photo-overlay {
   position: absolute;
-  right: 25px;
-  bottom: 27px;
-  left: 25px;
+  inset: auto 25px 27px 25px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  color: #fff;
+  color: var(--agri-white);
 }
 
 .landing-photo-label {
   width: fit-content;
   padding: 7px 11px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.16);
   font-size: 0.75rem;
   font-weight: 700;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -1206,7 +1413,7 @@
   padding: 14px 17px;
   border: 1px solid rgba(232, 238, 229, 0.9);
   border-radius: 17px;
-  background: #fff;
+  background: var(--agri-white);
   box-shadow: 0 14px 40px rgba(27, 55, 36, 0.14);
 }
 
@@ -1227,7 +1434,7 @@
   flex-shrink: 0;
   place-items: center;
   border-radius: 13px;
-  background: var(--landing-green-soft);
+  background: var(--agri-green-soft);
   font-size: 1.45rem;
 }
 
@@ -1243,7 +1450,7 @@
 
 .landing-floating-card small {
   margin-top: 3px;
-  color: var(--landing-muted);
+  color: var(--agri-muted);
   font-size: 0.77rem;
 }
 
@@ -1251,17 +1458,17 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding-top: 28px;
-  padding-bottom: 28px;
+  padding-block: 28px;
   border-top: 1px solid #e7e8de;
   color: #5f6d62;
   font-size: 0.86rem;
   font-weight: 650;
 }
 
+/* ---------- Sections ---------- */
+
 .section-space {
-  padding-top: 94px;
-  padding-bottom: 94px;
+  padding-block: 94px;
 }
 
 .landing-section-heading {
@@ -1273,55 +1480,32 @@
 .landing-section-heading h2,
 .landing-contact h2 {
   margin: 14px 0;
-  color: var(--landing-green-dark);
+  color: var(--agri-green-dark);
   font-size: clamp(2rem, 3.5vw, 3rem);
   font-weight: 830;
   letter-spacing: -0.06em;
   line-height: 1.14;
+  text-wrap: balance;
 }
 
 .landing-section-heading p,
 .landing-contact p {
   margin: 0;
-  color: var(--landing-muted);
+  color: var(--agri-muted);
   font-size: 1rem;
   line-height: 1.8;
 }
 
-.landing-community {
-  background: #fff;
+.landing-community,
+.landing-how {
+  background: var(--agri-white);
 }
 
-.landing-role-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+.landing-features {
+  background: var(--agri-cream);
 }
 
-.landing-role-card {
-  padding: 29px;
-  border: 1px solid #e5eae2;
-  border-radius: 22px;
-  background: #fff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.landing-role-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 35px rgba(23, 77, 56, 0.08);
-}
-
-.landing-role-icon,
-.landing-feature-icon {
-  display: grid;
-  width: 56px;
-  height: 56px;
-  place-items: center;
-  border-radius: 17px;
-  background: var(--landing-green-soft);
-  font-size: 1.7rem;
-}
-
+/* Titres et textes des cartes (partagés) */
 .landing-role-card h3,
 .landing-feature-card h3,
 .landing-step h3 {
@@ -1336,40 +1520,56 @@
 .landing-feature-card p,
 .landing-step p {
   margin-bottom: 18px;
-  color: var(--landing-muted);
+  color: var(--agri-muted);
   font-size: 0.94rem;
   line-height: 1.8;
+}
+
+/* Cartes des profils */
+.landing-role-card {
+  padding: 29px;
+  border: 1px solid #e5eae2;
+  border-radius: 22px;
+  background: var(--agri-white);
+  transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+
+.landing-role-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 35px rgba(23, 77, 56, 0.08);
+}
+
+.landing-role-icon,
+.landing-feature-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 17px;
+  background: var(--agri-green-soft);
+  font-size: 1.7rem;
 }
 
 .landing-role-card>a {
   display: inline-flex;
   gap: 9px;
-  color: var(--landing-green);
+  color: var(--agri-green);
   font-size: 0.9rem;
   font-weight: 800;
 }
 
-.landing-features {
-  background: var(--landing-cream);
-}
-
-.landing-feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 17px;
-}
-
+/* Cartes des fonctionnalités */
 .landing-feature-card {
   padding: 27px;
   border: 1px solid #e7e9df;
   border-radius: 19px;
-  background: #fff;
+  background: var(--agri-white);
 }
 
 .landing-feature-icon {
   width: 49px;
   height: 49px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   font-size: 1.4rem;
 }
 
@@ -1381,16 +1581,7 @@
   margin-bottom: 0;
 }
 
-.landing-how {
-  background: #fff;
-}
-
-.landing-steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 34px;
-}
-
+/* Étapes */
 .landing-step {
   position: relative;
   padding: 26px;
@@ -1415,9 +1606,11 @@
   margin-top: 28px;
 }
 
+/* ---------- Contact ---------- */
+
 .landing-contact {
   padding-top: 30px;
-  background: #fff;
+  background: var(--agri-white);
 }
 
 .landing-contact-panel {
@@ -1426,10 +1619,10 @@
   justify-content: space-between;
   gap: 45px;
   padding: 54px;
-  border-radius: 28px;
+  border-radius: var(--radius-xl);
   background:
     radial-gradient(ellipse at 90% 0%, rgba(131, 166, 105, 0.25), transparent 40%),
-    var(--landing-green);
+    var(--agri-green);
 }
 
 .landing-contact-panel>div:first-child {
@@ -1441,7 +1634,7 @@
 }
 
 .landing-contact h2 {
-  color: #fff;
+  color: var(--agri-white);
 }
 
 .landing-contact p {
@@ -1456,25 +1649,119 @@
   gap: 15px;
 }
 
-.landing-button-white {
-  border-color: #fff;
-  background: #fff;
-  color: var(--landing-green) !important;
-}
-
-.landing-button-white:hover {
-  background: #edf4e9;
-}
-
 .landing-contact-login {
-  color: #fff;
+  color: var(--agri-white);
   font-size: 0.9rem;
   font-weight: 650;
 }
 
+/* =========================================================
+   FORMULAIRE CONTACT — AGRI_MARK
+   ========================================================= */
+
+.landing-contact-form-wrapper {
+  flex: 1 1 480px;
+  min-width: 0;
+  max-width: 560px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(15, 45, 29, 0.15);
+}
+
+.contact-form {
+  width: 100%;
+}
+
+.contact-form .form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #203c2b;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.contact-form .form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dce5dc;
+  border-radius: 10px;
+  background: #fbfdfb;
+  color: #203c2b;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form .form-control:focus {
+  border-color: #23834f;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(35, 131, 79, 0.13);
+  outline: none;
+}
+
+.contact-form textarea.form-control {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.contact-form .btn-success {
+  padding: 13px 18px;
+  border: none;
+  border-radius: 11px;
+  background: #23834f;
+  color: #ffffff;
+  font-weight: 750;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.contact-form .btn-success:hover:not(:disabled) {
+  background: #17683d;
+  transform: translateY(-1px);
+}
+
+.contact-form .btn-success:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.contact-form .alert {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  line-height: 1.6;
+}
+
+.contact-form .alert p {
+  color: inherit;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .landing-contact-form-wrapper {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 auto;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .landing-contact-form-wrapper {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .contact-form .form-control {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ---------- Pied de page ---------- */
+
 .landing-footer {
-  padding: 30px 0;
-  background: #fff;
+  padding-block: 30px;
+  background: var(--agri-white);
 }
 
 .landing-footer-content {
@@ -1487,7 +1774,7 @@
 .landing-footer-content p,
 .landing-footer-content>span {
   margin: 0;
-  color: var(--landing-muted);
+  color: var(--agri-muted);
   font-size: 0.83rem;
 }
 
@@ -1501,11 +1788,12 @@
   font-size: 1rem;
 }
 
+/* ---------- Responsive page publique ---------- */
+
 @media (max-width: 1000px) {
   .landing-nav {
     flex-wrap: wrap;
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-block: 15px;
   }
 
   .landing-nav-links {
@@ -1551,7 +1839,7 @@
     font-size: 0.82rem;
   }
 
-  .landing-button-small {
+  .landing-page .landing-button-small {
     padding: 9px 11px;
     font-size: 0.8rem;
   }
@@ -1561,6 +1849,7 @@
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 4px;
+    scrollbar-width: thin;
   }
 
   .landing-nav-links a {
@@ -1614,8 +1903,7 @@
   }
 
   .section-space {
-    padding-top: 65px;
-    padding-bottom: 65px;
+    padding-block: 65px;
   }
 
   .landing-section-heading {
@@ -1628,13 +1916,13 @@
     grid-template-columns: 1fr;
   }
 
+  .landing-steps-grid {
+    --gap: 10px;
+  }
+
   .landing-role-card,
   .landing-feature-card {
     padding: 24px;
-  }
-
-  .landing-steps-grid {
-    gap: 10px;
   }
 
   .landing-step {
@@ -1686,7 +1974,7 @@
     font-size: 0.76rem;
   }
 
-  .landing-button-small {
+  .landing-page .landing-button-small {
     padding: 8px;
     font-size: 0.75rem;
   }
@@ -1706,5 +1994,32 @@
   .landing-floating-icon {
     width: 36px;
     height: 36px;
+  }
+}
+
+
+/* =====================================================================
+   10. MOUVEMENT RÉDUIT (accessibilité)
+   Désactive animations et transitions pour les personnes qui le demandent
+   ===================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .buyer-product-card:hover,
+  .buyer-hero-button:hover,
+  .landing-role-card:hover,
+  .landing-page .landing-button:hover {
+    transform: none;
   }
 }

@@ -12,6 +12,7 @@ import ProducerOrders from "./pages/producer/Orders";
 import CreateProduct from "./pages/producer/CreateProduct";
 import MyProduct from "./pages/producer/myProduct";
 import LandingPage from "./pages/LandingPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import Navbar from "./components/Navbar";
 import { useEffect, useState } from "react";
 import ProductService, { type Product } from "./services/ProductService";
@@ -216,6 +217,14 @@ function App() {
         {/* Route protégée générale */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+
+        {/* Route ADMINISTRATEUR */}
+        <Route element={<ProtectedRoute requireAdmin={true} />}>
+          <Route
+            path="/admin"
+            element={<AdminDashboard />}
+          />
         </Route>
 
         {/* Routes ACHETEUR */}
