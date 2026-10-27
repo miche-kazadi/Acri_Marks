@@ -78,7 +78,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 User = get_user_model()
 
+
 class ProfileSerializer(serializers.ModelSerializer):
+    is_staff = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
@@ -87,10 +90,14 @@ class ProfileSerializer(serializers.ModelSerializer):
             "full_name",
             "phone_or_email",
             "role",
+            "is_staff",
+            "is_superuser",
         ]
         read_only_fields = [
             "id",
             "role",
+            "is_staff",
+            "is_superuser",
         ]
 
 
@@ -163,4 +170,88 @@ class LoginSerializer(serializers.Serializer):
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }
-    
+
+
+class ContactSerializer(serializers.Serializer):
+    name = serializers.CharField(
+        max_length=100,
+        trim_whitespace=True
+    )
+    email = serializers.EmailField()
+    subject = serializers.CharField(
+        max_length=150,
+        trim_whitespace=True
+    )
+    message = serializers.CharField(
+        max_length=3000,
+        trim_whitespace=True
+    )
+
+    def validate_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                "Le nom est obligatoire."
+            )
+        return value
+
+    def validate_subject(self, value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                "Le sujet est obligatoire."
+            )
+        return value
+
+    def validate_message(self, value):
+        if len(value.strip()) < 10:
+            raise serializers.ValidationError(
+                "Le message doit contenir au moins 10 caractères."
+            )
+        return value
+class AdminCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "full_name",
+            "phone_or_email",
+            "password",
+        ]
+
+    def create(self, validated_data):
+        user = User.objects.create_superuser(
+            username=validated_data["phone_or_email"],
+            full_name=validated_data["full_name"],
+            phone_or_email=validated_data["phone_or_email"],
+            password=validated_data["password"],
+            role=User.Role.ACHETEUR,
+        )
+        return user
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "full_name",
+            "phone_or_email",
+            "role",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "full_name",
+            "phone_or_email",
+            "role",
+            "is_staff",
+            "is_superuser",
+            "created_at",
+        ]
+

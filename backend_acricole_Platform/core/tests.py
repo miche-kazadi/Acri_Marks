@@ -619,3 +619,80 @@ class OrderStockTest(APITestCase):
                 quantity=100
             ).exists()
         )
+
+
+from django.test import override_settings
+from django.core import mail
+
+
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    CONTACT_EMAIL="contact-test@agrimark.local",
+)
+class ContactViewTest(APITestCase):
+
+    def setUp(self):
+        self.url = "/api/v1/contact/"
+        self.valid_data = {
+            "name": "Jean Test",
+            "email": "jean@example.com",
+            "subject": "Demande de partenariat",
+            "message": (
+                "Bonjour, je souhaite obtenir des informations "
+                "sur votre plateforme Agri_Mark."
+            ),
+        }
+
+    def test_contact_valid_message_sends_email(self):
+        response = self.client.post(
+            self.url,
+            self.valid_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].to,
+            ["contact-test@agrimark.local"],
+        )
+        self.assertEqual(
+            mail.outbox[0].reply_to,
+            ["jean@example.com"],
+        )
+
+    def test_contact_invalid_email_is_rejected(self):
+        data = {
+            **self.valid_data,
+            "email": "adresse-invalide",
+        }
+
+        response = self.client.post(
+            self.url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_contact_short_message_is_rejected(self):
+        data = {
+            **self.valid_data,
+            "message": "Salut",
+        }
+
+        response = self.client.post(
+            self.url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertEqual(len(mail.outbox), 0)

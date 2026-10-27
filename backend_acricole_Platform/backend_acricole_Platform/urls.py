@@ -23,11 +23,25 @@ from core.views import (
     ProducerOrdersView,
     ProducerProductsView,
     ProfilView,
+    ContactView,
+    AdminStatsView,
+    AdminCreateView,
+    AdminUserListView,
+    AdminUserDetailView,
+    AdminProductListView,
+    AdminProductDetailView,
+    AdminOrderListView,
+    AdminOrderDetailView,
 )
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+    "api/v1/admin/stats/",
+    AdminStatsView.as_view(),
+    name="admin-stats",
+),
 
     # Authentification
     path(
@@ -115,5 +129,26 @@ urlpatterns = [
         ProfilView.as_view(),
         name="profile-user"
     ),
+        # Contact
+    path(
+        "api/v1/contact/",
+        ContactView.as_view(),
+        name="contact",
+    ),  
+
+        path(
+        "api/v1/admin/create/",
+        AdminCreateView.as_view(),
+        name="admin-create",
+    ),
+        # Admin : gestion de la plateforme
+    path("api/v1/admin/users/", AdminUserListView.as_view(), name="admin-users"),
+    path("api/v1/admin/users/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-detail"),
+
+    path("api/v1/admin/products/", AdminProductListView.as_view(), name="admin-products"),
+    path("api/v1/admin/products/<int:pk>/", AdminProductDetailView.as_view(), name="admin-product-detail"),
+
+    path("api/v1/admin/orders/", AdminOrderListView.as_view(), name="admin-orders"),
+    path("api/v1/admin/orders/<int:pk>/", AdminOrderDetailView.as_view(), name="admin-order-detail"),
     
 ]

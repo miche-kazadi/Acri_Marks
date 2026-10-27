@@ -147,3 +147,5 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Commande #{self.id} - {self.product.title}"
+
+

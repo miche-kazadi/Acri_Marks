@@ -23,6 +23,8 @@ const login = async (
 
   // 4. Sauvegarder le rôle
   localStorage.setItem("user_role", profile.role);
+  localStorage.setItem("is_staff", profile.is_staff.toString());
+  localStorage.setItem("is_superuser", profile.is_superuser.toString());
 
   return {
     ...data,

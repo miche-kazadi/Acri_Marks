@@ -1,5 +1,5 @@
-
 import { Link } from "react-router-dom";
+import ContactForm from "../components/ContactForm";
 
 const features = [
   {
@@ -251,27 +251,41 @@ function LandingPage() {
         </div>
       </section>
 
+
       <section className="landing-contact section-space" id="contact">
         <div className="landing-container landing-contact-panel">
-          <div>
-            <span className="landing-section-kicker">Contact & partenariat</span>
+          <div className="landing-contact-intro">
+            <span className="landing-section-kicker">
+              Contact & partenariat
+            </span>
+
             <h2>Vous souhaitez faire grandir votre activité ?</h2>
+
             <p>
               Vous êtes producteur, acheteur ou partenaire et souhaitez en
-              savoir plus sur Agri_Mark ? Rejoignez la plateforme ou connectez-vous
-              pour découvrir votre espace.
+              savoir plus sur Agri_Mark ? Envoyez-nous votre message.
             </p>
+
+            <div className="landing-contact-actions">
+              <Link
+                to="/register"
+                className="landing-button landing-button-white"
+              >
+                Créer un compte <span>→</span>
+              </Link>
+
+              <Link to="/login" className="landing-contact-login">
+                J'ai déjà un compte
+              </Link>
+            </div>
           </div>
-          <div className="landing-contact-actions">
-            <Link to="/register" className="landing-button landing-button-white">
-              Créer un compte <span>→</span>
-            </Link>
-            <Link to="/login" className="landing-contact-login">
-              J'ai déjà un compte
-            </Link>
+
+          <div className="landing-contact-form-wrapper">
+            <ContactForm />
           </div>
         </div>
       </section>
+
 
       <footer className="landing-footer">
         <div className="landing-container landing-footer-content">

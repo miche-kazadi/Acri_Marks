@@ -5,19 +5,32 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .models import Product, Order,User
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAcheteur, IsProducteur
+from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
+from django.conf import settings
+from django.core.mail import EmailMessage
+from rest_framework.throttling import AnonRateThrottle
+from .serializers import ContactSerializer
 from .serializers import (
     OrderSerializer,
     ProductSerializer,
     LoginSerializer,
     RegisterSerializer,
-    ProfileSerializer
+    ProfileSerializer, 
+    AdminCreateSerializer,
+    AdminUserSerializer,
 
 )
-from django.db.models import Q
-from rest_framework.pagination import PageNumberPagination
+
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+)
+from django.db.models import Count
+from rest_framework.permissions import BasePermission
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -34,6 +47,56 @@ class LoginView(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+class IsSuperuserAdmin(BasePermission):
+    """
+    Autorise uniquement les administrateurs superutilisateurs.
+    """
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_staff
+            and request.user.is_superuser
+        )
+
+class AdminStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsSuperuserAdmin]
+
+    def get(self, request):
+        return Response({
+            "users": {
+                "total": User.objects.count(),
+                "producers": User.objects.filter(
+                    role=User.Role.PRODUCTEUR
+                ).count(),
+                "buyers": User.objects.filter(
+                    role=User.Role.ACHETEUR
+                ).count(),
+            },
+            "products": {
+                "total": Product.objects.count(),
+                "open": Product.objects.filter(
+                    status=Product.Status.OPEN
+                ).count(),
+                "sold_out": Product.objects.filter(
+                    status=Product.Status.SOLD_OUT
+                ).count(),
+            },
+            "orders": {
+                "total": Order.objects.count(),
+                "pending": Order.objects.filter(
+                    status=Order.Status.PENDING
+                ).count(),
+                "confirmed": Order.objects.filter(
+                    status=Order.Status.CONFIRMED
+                ).count(),
+                "completed": Order.objects.filter(
+                    status=Order.Status.COMPLETED
+                ).count(),
+            },
+        })
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -611,3 +674,238 @@ class ProducerProductsView(APIView):
             serializer.data,
             status=status.HTTP_200_OK
         )
+
+class ContactView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        serializer = ContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        name = serializer.validated_data["name"]
+        email = serializer.validated_data["email"]
+        subject = serializer.validated_data["subject"]
+        message = serializer.validated_data["message"]
+
+        recipient = getattr(settings, "CONTACT_EMAIL", None)
+
+        if not recipient:
+            return Response(
+                {"error": "Le service de contact n'est pas encore configuré."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        try:
+            email_message = EmailMessage(
+                subject=f"[Agri_Mark Contact] {subject}",
+                body=(
+                    f"Nom : {name}\n"
+                    f"E-mail : {email}\n\n"
+                    f"Message :\n{message}"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[recipient],
+                reply_to=[email],
+            )
+            email_message.send(fail_silently=False) 
+            
+        except Exception:
+            return Response(
+                {"error": "Impossible d'envoyer le message pour le moment."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        return Response(
+            {"message": "Votre message a été envoyé."},
+            status=status.HTTP_200_OK,
+        )
+class IsSuperUser(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_superuser
+        )
+
+
+class AdminCreateView(APIView):
+    permission_classes = [IsSuperUser]
+    def post(self, request):
+        serializer = AdminCreateSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+
+            return Response(
+                {
+                    "message": "Compte administrateur créé avec succès.",
+                    "user": {
+                        "id": user.id,
+                        "full_name": user.full_name,
+                        "phone_or_email": user.phone_or_email,
+                        "is_staff": user.is_staff,
+                        "is_superuser": user.is_superuser,
+                    },
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        u = request.user
+        return bool(u and u.is_authenticated and u.is_staff and u.is_superuser)
+
+
+class AdminPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
+class AdminBaseView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+
+# ---------- UTILISATEURS ----------
+class AdminUserListView(AdminBaseView):
+    def get(self, request):
+        users = User.objects.all().order_by("-id")
+
+        search = request.query_params.get("search")
+        if search:
+            users = users.filter(
+                Q(full_name__icontains=search) | Q(phone_or_email__icontains=search)
+            )
+
+        role = request.query_params.get("role")
+        if role:
+            users = users.filter(role=role)
+
+        paginator = AdminPagination()
+        page = paginator.paginate_queryset(users, request)
+        return paginator.get_paginated_response(
+            AdminUserSerializer(page, many=True).data
+        )
+
+
+class AdminUserDetailView(AdminBaseView):
+    def patch(self, request, pk):
+        user = User.objects.filter(pk=pk).first()
+        if not user:
+            return Response({"error": "Utilisateur introuvable."}, status=404)
+
+        if user == request.user:
+            return Response(
+                {"error": "Vous ne pouvez pas modifier votre propre compte ici."},
+                status=400,
+            )
+
+        serializer = AdminUserSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        user = User.objects.filter(pk=pk).first()
+        if not user:
+            return Response({"error": "Utilisateur introuvable."}, status=404)
+
+        if user == request.user or user.is_superuser:
+            return Response(
+                {"error": "Impossible de supprimer ce compte."}, status=400
+            )
+
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---------- PRODUITS ----------
+class AdminProductListView(AdminBaseView):
+    def get(self, request):
+        products = Product.objects.select_related("producer").order_by("-created_at")
+
+        search = request.query_params.get("search")
+        if search:
+            products = products.filter(
+                Q(title__icontains=search) | Q(producer__full_name__icontains=search)
+            )
+
+        for field in ("status", "category"):
+            value = request.query_params.get(field)
+            if value:
+                products = products.filter(**{field: value})
+
+        paginator = AdminPagination()
+        page = paginator.paginate_queryset(products, request)
+        return paginator.get_paginated_response(
+            ProductSerializer(page, many=True).data
+        )
+
+
+class AdminProductDetailView(AdminBaseView):
+    def patch(self, request, pk):
+        product = Product.objects.filter(pk=pk).first()
+        if not product:
+            return Response({"error": "Produit introuvable."}, status=404)
+
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        product = Product.objects.filter(pk=pk).first()
+        if not product:
+            return Response({"error": "Produit introuvable."}, status=404)
+
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---------- COMMANDES ----------
+class AdminOrderListView(AdminBaseView):
+    def get(self, request):
+        orders = Order.objects.select_related("buyer", "product").order_by("-created_at")
+
+        order_status = request.query_params.get("status")
+        if order_status:
+            orders = orders.filter(status=order_status)
+
+        paginator = AdminPagination()
+        page = paginator.paginate_queryset(orders, request)
+        return paginator.get_paginated_response(
+            OrderSerializer(page, many=True).data
+        )
+
+
+class AdminOrderDetailView(AdminBaseView):
+    @transaction.atomic
+    def patch(self, request, pk):
+        order = Order.objects.select_for_update().filter(pk=pk).first()
+        if not order:
+            return Response({"error": "Commande introuvable."}, status=404)
+
+        new_status = request.data.get("status")
+        if new_status not in Order.Status.values:
+            return Response({"error": "Statut invalide."}, status=400)
+
+        # Si l'admin annule une commande active, on remet le stock
+        if new_status == Order.Status.CANCELLED and order.status != Order.Status.CANCELLED:
+            product = Product.objects.select_for_update().get(pk=order.product_id)
+            product.quantity_available += order.quantity
+            if product.status == Product.Status.SOLD_OUT:
+                product.status = Product.Status.OPEN
+            product.save()
+
+        order.status = new_status
+        order.save(update_fields=["status"])
+        return Response(OrderSerializer(order).data)
