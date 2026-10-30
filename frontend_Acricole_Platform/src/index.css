@@ -178,3 +178,94 @@ button,
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ===================== MODE SOMBRE ===================== */
+:root[data-bs-theme="dark"] {
+  color-scheme: dark;
+  background: #0f1a14;
+  color: #e4ece6;
+
+  --agri-cream: #0f1a14;
+  --agri-text: #e4ece6;
+  --agri-muted: #9db0a3;
+  --agri-border: #2a3b31;
+  --agri-green-light: #1d3427;
+  --agri-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+
+/* Titres et liens lisibles sur fond sombre */
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6 {
+  color: #f1f6f2;
+}
+
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link) {
+  color: #7fc79d;
+}
+
+/* Surfaces qui étaient blanches */
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .buyer-product-card,
+[data-bs-theme="dark"] .buyer-step,
+[data-bs-theme="dark"] .buyer-search-box,
+[data-bs-theme="dark"] .buyer-category-filters button,
+[data-bs-theme="dark"] .role-option {
+  background: #172720 !important;
+  border-color: var(--agri-border) !important;
+  color: var(--agri-text);
+}
+
+[data-bs-theme="dark"] .buyer-state-panel {
+  background: rgba(23, 39, 32, 0.7);
+  border-color: var(--agri-border);
+}
+
+/* Formulaires */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+  background-color: #1b2e25;
+  border-color: var(--agri-border);
+  color: var(--agri-text);
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+  color: #7f9487;
+}
+
+[data-bs-theme="dark"] .input-group-text,
+[data-bs-theme="dark"] .bg-light {
+  background-color: #1b2e25 !important;
+  border-color: var(--agri-border);
+  color: var(--agri-text);
+}
+
+[data-bs-theme="dark"] .bg-success-subtle {
+  background-color: #0f1a14 !important;
+}
+
+/* Tableaux */
+[data-bs-theme="dark"] .table {
+  --bs-table-color: var(--agri-text);
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+  --bs-table-border-color: var(--agri-border);
+}
+
+/* Boutons contour */
+[data-bs-theme="dark"] .btn-outline-success {
+  color: #7fc79d;
+  border-color: #3b6a50;
+}
+
+[data-bs-theme="dark"] .btn-outline-success:hover {
+  background: var(--agri-green);
+  color: #fff;
+}
+
+[data-bs-theme="dark"] .text-muted {
+  color: var(--agri-muted) !important;
+}

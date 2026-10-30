@@ -7,8 +7,11 @@ The `urlpatterns` list routes URLs to views.
 from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 
 from core.views import (
+    ChangePasswordView,
     LoginView,
     LogoutView,
     MeView,
@@ -141,6 +144,12 @@ urlpatterns = [
         AdminCreateView.as_view(),
         name="admin-create",
     ),
+    path(
+        "api/v1/profile/password/",
+        ChangePasswordView.as_view(),
+        name="change-password",
+    ),
+   
         # Admin : gestion de la plateforme
     path("api/v1/admin/users/", AdminUserListView.as_view(), name="admin-users"),
     path("api/v1/admin/users/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-detail"),
@@ -152,3 +161,5 @@ urlpatterns = [
     path("api/v1/admin/orders/<int:pk>/", AdminOrderDetailView.as_view(), name="admin-order-detail"),
     
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

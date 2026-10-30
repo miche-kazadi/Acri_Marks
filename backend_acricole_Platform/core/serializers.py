@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Product, Order
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken 
+from django.contrib.auth.password_validation import validate_password
+
 
 class ProductSerializer(serializers.ModelSerializer):
     producer_name = serializers.CharField(
@@ -82,6 +84,7 @@ User = get_user_model()
 class ProfileSerializer(serializers.ModelSerializer):
     is_staff = serializers.BooleanField(read_only=True)
     is_superuser = serializers.BooleanField(read_only=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
@@ -90,6 +93,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "full_name",
             "phone_or_email",
             "role",
+            "avatar",
             "is_staff",
             "is_superuser",
         ]
@@ -100,6 +104,23 @@ class ProfileSerializer(serializers.ModelSerializer):
             "is_superuser",
         ]
 
+    def validate_avatar(self, value):
+        if value is None:
+            return value
+        if value.size > 2 * 1024 * 1024:
+            raise serializers.ValidationError("L'image ne doit pas dépasser 2 Mo.")
+        return value
+
+    def update(self, instance, validated_data):
+        new_contact = validated_data.get("phone_or_email")
+        if new_contact:
+            instance.username = new_contact
+
+        # Supprime l'ancienne photo du disque quand on la remplace ou la retire
+        if "avatar" in validated_data and instance.avatar:
+            instance.avatar.delete(save=False)
+
+        return super().update(instance, validated_data)
 
 class RegisterSerializer(serializers.ModelSerializer):
 
@@ -255,3 +276,18 @@ class AdminUserSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_old_password(self, value):
+        user = self.context["request"].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("L'ancien mot de passe est incorrect.")
+        return value
+
+    def validate_new_password(self, value):
+        validate_password(value, self.context["request"].user)
+        return value

@@ -17,6 +17,8 @@ import Navbar from "./components/Navbar";
 import { useEffect, useState } from "react";
 import ProductService, { type Product } from "./services/ProductService";
 import OrderService, { type Order } from "./services/OrderService";
+import ProfilePage from "./pages/Profile";
+
 function Dashboard() {
   return (
     <div className="container py-5">
@@ -217,6 +219,7 @@ function App() {
         {/* Route protégée générale */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profil" element={<ProfilePage />} />
         </Route>
 
         {/* Route ADMINISTRATEUR */}
