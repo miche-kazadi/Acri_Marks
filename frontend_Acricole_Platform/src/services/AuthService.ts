@@ -54,8 +54,42 @@ const getProfile = async () => {
   return response.data;
 };
 
+const updateProfile = async (payload: {
+  full_name?: string;
+  phone_or_email?: string;
+}) => {
+  const response = await Api.patch("/profile/", payload);
+  return response.data;
+};
+
+const changePassword = async (oldPassword: string, newPassword: string) => {
+  const response = await Api.post("/profile/password/", {
+    old_password: oldPassword,
+    new_password: newPassword,
+  });
+  return response.data;
+};
+const updateAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  const response = await Api.patch("/profile/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+const removeAvatar = async () => {
+  const response = await Api.patch("/profile/", { avatar: null });
+  return response.data;
+};
+
 export default {
   login,
   register,
-  getProfile
+  getProfile,
+  updateProfile,
+  changePassword,
+  updateAvatar,
+  removeAvatar,
 };
