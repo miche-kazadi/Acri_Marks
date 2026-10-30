@@ -21,9 +21,10 @@ from .serializers import (
     ProfileSerializer, 
     AdminCreateSerializer,
     AdminUserSerializer,
+    ChangePasswordSerializer,
 
 )
-
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
@@ -267,8 +268,7 @@ class ProductListCreateView(APIView):
         return [IsAuthenticated(), IsProducteur()]
 
     def get(self, request):
-        products = Product.objects.all()
-
+        products = Product.objects.filter(status=Product.Status.OPEN)
         search = request.query_params.get("search")
 
         if search:
@@ -627,35 +627,27 @@ class ProducerOrdersView(APIView):
 
 class ProfilView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
-        serializer = ProfileSerializer(request.user)
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
+        serializer = ProfileSerializer(
+            request.user, context={"request": request}
         )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
         serializer = ProfileSerializer(
             request.user,
             data=request.data,
-            partial=True
+            partial=True,
+            context={"request": request},
         )
 
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response(
-                serializer.data,
-                status=status.HTTP_200_OK
-            )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProducerProductsView(APIView):
     permission_classes = [IsAuthenticated, IsProducteur]
@@ -909,3 +901,20 @@ class AdminOrderDetailView(AdminBaseView):
         order.status = new_status
         order.save(update_fields=["status"])
         return Response(OrderSerializer(order).data)
+    
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        request.user.set_password(serializer.validated_data["new_password"])
+        request.user.save()
+
+        return Response(
+            {"message": "Mot de passe modifié avec succès."},
+            status=status.HTTP_200_OK,
+        )

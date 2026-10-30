@@ -12,6 +12,11 @@ class User(AbstractUser):
         max_length=20,
         choices=Role.choices
     )
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True,
+    )
 
     phone_or_email = models.CharField(
         max_length=150,

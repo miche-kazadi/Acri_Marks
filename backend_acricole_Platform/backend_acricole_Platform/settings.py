@@ -160,3 +160,5 @@ REST_FRAMEWORK = {
         "anon": "5/hour",
     },
 }
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
