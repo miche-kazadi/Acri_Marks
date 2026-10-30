@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     ).split(",")
     if host.strip()
 ]
+ALLOWED_HOSTS.append("acri-marks.onrender.com")
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -76,12 +77,20 @@ CORS_ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
+CORS_ALLOWED_ORIGINS.extend([
+    "https://agri-mark-55f6e.web.app",
+    "https://agri-mark-55f6e.firebaseapp.com",
+])
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS.extend([
+    "https://agri-mark-55f6e.web.app",
+    "https://agri-mark-55f6e.firebaseapp.com",
+])
 # --------------------------------------------------
 # URLS ET TEMPLATES
 # --------------------------------------------------
