@@ -52,3 +52,28 @@ lerna-debug.log*
 # Git backup
 # =========================
 frontend_Acricole_Platform.git-backup/
+printf '\n# Fichiers sensibles et sauvegardes\n.env\n*.dump\n' >> .gitignore
+
+cat >> .gitignore <<'EOF'
+
+# Variables d'environnement
+.env
+**/.env
+
+# Sauvegardes de bases de données
+*.dump
+*.sql
+*.sqlite3
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+
+# Environnements virtuels
+venv/
+wichey/
+.venv/
+
+# Fichiers générés
+staticfiles/
+EOF
